@@ -1,0 +1,370 @@
+/*
+  カラーパレットを夕焼けのような淡いグラデーションに更新します。
+  以前の配色は単調だったため、オレンジ、ブルー、ピンク、パープルなど複数の色味を取り入れました。
+*/
+:root {
+  --primary: #ffb7a8;   /* 柔らかな夕焼けオレンジ */
+  --secondary: #a8d8f0; /* 淡いスカイブルー */
+  --tertiary: #f2c1d1;  /* ほんのりピンク */
+  --accent: #cbbbe6;    /* パステルパープル */
+  --background: #fef7f1;/* オフホワイト */
+  --text: #333333;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+  /* 日本語環境でも読みやすいフォントを指定 */
+  font-family: 'Segoe UI', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  /* ヘッダーは淡いグラデーションで彩ります */
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+  padding: 1rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+h1, h2 {
+  margin: 0.5rem 0;
+}
+
+main {
+  padding: 0 1rem;
+}
+
+section {
+  margin: 1rem 0;
+  padding: 1rem;
+  /* セクション背景も柔らかな色に変更 */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+input, textarea, button {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #cccccc;
+  font-size: 1rem;
+}
+
+/* select 要素も他の入力欄と同じスタイルを適用します */
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #cccccc;
+  font-size: 1rem;
+  background-color: #ffffff;
+}
+
+/* ラベル内の select は下に配置 */
+label select {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+button {
+  background-color: var(--primary);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  /* ボタンをホバーした際はアクセントカラーに */
+  background-color: var(--accent);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border-bottom: 1px solid #dddddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#memo-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+/* ---------------------------------------------
+   ナビゲーションバー
+   Flexレイアウトでタブをボタン風に整列し、すべてのリンクを常に表示します。
+--------------------------------------------- */
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+.main-nav a {
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  background-color: var(--secondary);
+  color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.main-nav a:hover {
+  background-color: var(--accent);
+  color: #ffffff;
+}
+.main-nav a.active {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+/* 右下固定のログアウトボタン */
+.logout-bottom {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background-color: #cccccc;
+  color: #333333;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #bbbbbb;
+  text-decoration: none;
+  z-index: 1000;
+}
+.logout-bottom:hover {
+  background-color: #bbbbbb;
+}
+
+/* テーブルの操作ボタン列の整列 */
+table td button {
+  display: inline-block;
+  width: auto;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
+/* プロフィールの検索や追加ボタンを横並びにするためのレイアウト */
+/* プロフィール一覧：検索グループと新規登録ボタンの配置 */
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* プロフィール画面のボタンは幅を自動にする（グローバルの100%指定を上書き） */
+.profile-actions button {
+  width: auto;
+}
+.search-group {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 0.5rem;
+}
+.search-group input {
+  flex: 1 1 auto;
+}
+.search-group button {
+  width: auto;
+}
+.new-profile-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  background-color: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+  width: auto; /* グローバル設定を上書きして幅を自動にする */
+}
+.new-profile-btn:hover {
+  background-color: var(--primary);
+}
+
+/* 統計カードのスタイル */
+.stats-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.card {
+  flex: 1 1 200px;
+  background-color: var(--tertiary);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.card h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+.card p {
+  font-size: 1.3rem;
+  margin: 0.5rem 0 0;
+  font-weight: bold;
+}
+
+/* クイック操作セクション */
+.quick-actions .action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.quick-actions .button {
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  background-color: var(--secondary);
+  color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.quick-actions .button:hover {
+  background-color: var(--accent);
+  color: #ffffff;
+}
+
+/* ステータス管理ページのラジオボタンのグループレイアウト */
+.status-options {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.status-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+}
+
+/* ---------------------------------------------
+   ログインページのスタイル
+   トップページではログイン・新規登録の選択肢をボタン風に表示します
+--------------------------------------------- */
+.auth-choice {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+.auth-choice .auth-btn {
+  flex: 1 1 200px;
+  padding: 1rem;
+  border-radius: 30px;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  color: #ffffff;
+  transition: opacity 0.2s ease;
+}
+.auth-choice .auth-btn:hover {
+  opacity: 0.85;
+}
+.login-btn {
+  background-color: var(--secondary);
+}
+.register-btn {
+  background-color: var(--tertiary);
+}
+
+/* ログイン／登録フォームの戻るボタン */
+.back-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  background-color: var(--secondary);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.back-btn:hover {
+  background-color: var(--accent);
+  color: #ffffff;
+}
+
+/* -------------------------------------------------
+   レスポンシブデザイン: スマートフォン画面向けの調整
+   画面幅が600px以下の場合に適用されます
+------------------------------------------------- */
+@media (max-width: 600px) {
+  /* ナビゲーションを縦並びにし、全幅ボタンとして表示 */
+  .main-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .main-nav a {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  /* プロフィールアクションを縦に並べる */
+  .profile-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-group {
+    flex-direction: column;
+  }
+  /* 統計カードを縦に並べる */
+  .stats-cards {
+    flex-direction: column;
+  }
+  .stats-cards .card {
+    flex: 1 1 100%;
+  }
+  /* テーブルの文字サイズを調整して見やすくする */
+  table, th, td {
+    font-size: 0.9rem;
+  }
+  /* 右下ログアウトボタンをタップしやすいサイズに */
+  .logout-bottom {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+  /* ログイン／新規登録の選択肢ボタンを全幅に */
+  .auth-choice .auth-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

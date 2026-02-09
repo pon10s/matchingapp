@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>ログイン - マッチングアプリ管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="login.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>マッチングアプリ管理</h1>
+    </header>
+    <main>
+      <!-- 最初に表示する選択肢セクション -->
+      <section id="auth-choice">
+        <h2>ようこそ</h2>
+        <div class="auth-choice">
+          <button id="show-login" class="auth-btn login-btn">ログイン</button>
+          <button id="show-register" class="auth-btn register-btn">新規登録</button>
+        </div>
+      </section>
+
+      <!-- ログインフォームセクション -->
+      <section id="login-section" style="display:none;">
+        <h2>ログイン</h2>
+        <form id="login-form">
+          <label>ユーザー名:
+            <input type="text" id="login-username" required>
+          </label>
+          <label>パスワード:
+            <input type="password" id="login-password" required>
+          </label>
+          <button type="submit">ログイン</button>
+        </form>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" id="back-to-choice-login" class="back-btn">戻る</button>
+          <a href="index.html" class="back-btn">トップへ</a>
+        </div>
+      </section>
+
+      <!-- 新規登録フォームセクション -->
+      <section id="register-section" style="display:none;">
+        <h2>新規登録</h2>
+        <form id="register-form">
+          <label>ユーザー名:
+            <input type="text" id="register-username" required>
+          </label>
+          <label>パスワード:
+            <input type="password" id="register-password" required>
+          </label>
+          <button type="submit">登録</button>
+        </form>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="button" id="back-to-choice-register" class="back-btn">戻る</button>
+          <a href="index.html" class="back-btn">トップへ</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

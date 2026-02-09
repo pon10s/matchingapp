@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>プロフィール編集 - マッチングアプリ管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="db.js"></script>
+    <script defer src="edit-profile.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1 id="page-title">プロフィール登録</h1>
+    </header>
+    <nav class="main-nav">
+      <a href="index.html">ホーム</a>
+      <a href="profiles.html" class="active">プロフィール一覧</a>
+      <a href="events.html">デート登録</a>
+      <a href="calendar.html">デートのあしあと</a>
+    </nav>
+    <main>
+      <section>
+        <form id="profile-form">
+          <input type="hidden" id="profileId" value="">
+          <label>ニックネーム:
+            <input type="text" id="nickname" required>
+          </label>
+          <label>マッチング日:
+            <input type="date" id="dateMet">
+          </label>
+          <label>一言でいうとどんな人？:
+            <input type="text" id="hobbies">
+          </label>
+          <label>ステータス:
+            <select id="statusTag">
+              <option value="">選択してください</option>
+              <option value="本命">本命</option>
+              <option value="あり">あり</option>
+              <option value="わからない">わからない</option>
+              <option value="キープ">キープ</option>
+              <option value="なし">なし</option>
+              <option value="セフレ">セフレ</option>
+              <option value="ネタ">ネタ</option>
+              <option value="友達">友達</option>
+            </select>
+          </label>
+          <label>アプリ名（タグ）:
+            <input type="text" id="appTag">
+          </label>
+          <button type="submit">保存</button>
+          <button type="button" id="cancelBtn">キャンセル</button>
+        </form>
+      </section>
+    </main>
+    <!-- 右下に固定表示するログアウトボタン -->
+    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
+    <footer>
+      <p>&copy;2026 マッチングアプリ管理</p>
+    </footer>
+  </body>
+</html>

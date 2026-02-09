@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>マッチングアプリ管理 - ホーム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="db.js"></script>
+    <script defer src="index.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>マッチングアプリ管理</h1>
+    </header>
+    <nav class="main-nav">
+      <a href="index.html" class="active">ホーム</a>
+      <a href="profiles.html">プロフィール一覧</a>
+      <!-- ステータス管理ページは削除されたためリンクも削除 -->
+      <a href="events.html">デート登録</a>
+      <a href="calendar.html">デートのあしあと</a>
+    </nav>
+    <main>
+      <!-- 概要セクション: 登録数や予定数などの統計表示 -->
+      <section class="stats">
+        <h2>概要</h2>
+        <div class="stats-cards">
+          <div class="card">
+            <h3>登録相手</h3>
+            <p id="profiles-count">-- 人</p>
+          </div>
+          <div class="card">
+            <h3>今後の予定</h3>
+            <p id="upcoming-count">-- 件</p>
+          </div>
+          <div class="card">
+            <h3>更新待ち</h3>
+            <p id="pending-count">-- 件</p>
+          </div>
+        </div>
+      </section>
+      <!-- 更新が必要なイベントを表示 -->
+      <section>
+        <h2>更新が必要なイベント</h2>
+        <ul id="pending-list" style="list-style: none; padding-left: 0;"></ul>
+      </section>
+      <!-- クイック操作セクションは不要になったため削除 -->
+    </main>
+    <!-- 右下に固定表示するログアウトボタン -->
+    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
+    <footer>
+      <p>&copy;2026 マッチングアプリ管理</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>デート登録 - マッチングアプリ管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="db.js"></script>
+    <script defer src="events.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>デート登録</h1>
+    </header>
+    <nav class="main-nav">
+      <a href="index.html">ホーム</a>
+      <a href="profiles.html">プロフィール一覧</a>
+      <a href="events.html" class="active">デート登録</a>
+      <a href="calendar.html">デートのあしあと</a>
+    </nav>
+    <main>
+      <section>
+        <h2>予定を追加</h2>
+        <form id="event-form">
+          <!-- 編集時に利用するIDを格納する隠しフィールド -->
+          <input type="hidden" id="eventId" value="">
+          <label>相手:
+            <select id="profileSelect"></select>
+          </label>
+          <label>日付:
+            <input type="date" id="eventDate" required>
+          </label>
+          <!-- 感想の入力は編集モードのみで表示 -->
+          <div id="commentField" style="display:none;">
+            <label>感想:
+              <input type="text" id="eventNote" placeholder="デートの感想を入力">
+            </label>
+          </div>
+          <button type="submit" id="eventSubmitBtn">追加</button>
+        </form>
+      </section>
+      <section>
+        <h2>デート履歴・予定一覧</h2>
+        <table id="events-table">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>相手</th>
+              <th>回数</th>
+              <th>感想</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Events list will render here -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <!-- 右下に固定表示するログアウトボタン -->
+    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
+    <footer>
+      <p>&copy;2026 マッチングアプリ管理</p>
+    </footer>
+  </body>
+</html>
