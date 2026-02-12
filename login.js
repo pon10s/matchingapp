@@ -36,41 +36,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ログイン処理
   const loginForm = document.getElementById('login-form');
-  loginForm.addEventListener('submit', e => {
+  loginForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const username = document.getElementById('login-username').value.trim();
+    const email = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!username || !password) return;
-    const storedPw = localStorage.getItem('user_' + username);
-    if (storedPw === null) {
-      alert('ユーザーが見つかりません。新規登録してください。');
-      return;
+    if (!email || !password) return;
+    try {
+      // Supabase Auth でログインを試みる
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      // ログイン成功。ホーム画面へ遷移
+      window.location.href = 'index.html';
+    } catch (err) {
+      alert(err.message);
     }
-    if (storedPw !== password) {
-      alert('パスワードが正しくありません。');
-      return;
-    }
-    // ログイン成功
-    localStorage.setItem('currentUser', username);
-    window.location.href = 'index.html';
   });
 
   // 新規登録処理
   const registerForm = document.getElementById('register-form');
-  registerForm.addEventListener('submit', e => {
+  registerForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const username = document.getElementById('register-username').value.trim();
+    const email = document.getElementById('register-username').value.trim();
     const password = document.getElementById('register-password').value;
-    if (!username || !password) return;
-    if (localStorage.getItem('user_' + username) !== null) {
-      alert('同じユーザー名は既に登録されています。別の名前を選んでください。');
-      return;
+    if (!email || !password) return;
+    try {
+      // Supabase Auth で新規登録
+      const { error } = await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      alert('登録が完了しました。ログインしてください。');
+      // 登録後入力内容をクリアしてログインフォームへ戻す
+      registerForm.reset();
+      registerSection.style.display = 'none';
+      choiceSection.style.display = 'block';
+    } catch (err) {
+      alert(err.message);
     }
-    localStorage.setItem('user_' + username, password);
-    alert('登録が完了しました。ログインしてください。');
-    // 登録後入力内容をクリアしてログインフォームへ戻す
-    registerForm.reset();
-    registerSection.style.display = 'none';
-    choiceSection.style.display = 'block';
   });
 });

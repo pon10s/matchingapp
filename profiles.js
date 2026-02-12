@@ -1,10 +1,11 @@
 // Profiles listing page script
-document.addEventListener('DOMContentLoaded', () => {
-  const dbInstance = initDb();
-  if (!dbInstance) return;
+document.addEventListener('DOMContentLoaded', async () => {
+  // ログインチェック
+  const user = await ensureLoggedIn();
+  if (!user) return;
   // Initialize events
   document.getElementById('addNewBtn').addEventListener('click', () => {
-    // id=0 indicates new
+    // id param omitted indicates new profile
     window.location.href = 'edit-profile.html';
   });
   document.getElementById('searchBtn').addEventListener('click', () => {
@@ -16,23 +17,30 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function refreshProfiles(filter = '') {
-  const db = initDb();
-  if (!db) return;
-  let profiles = [];
-  if (!filter) {
-    profiles = await db.profiles.toArray();
-  } else {
-    const keyword = filter.toLowerCase();
-    profiles = await db.profiles.filter(p => {
-      return (
-        p.nickname.toLowerCase().includes(keyword) ||
-        (p.statusTag && p.statusTag.toLowerCase().includes(keyword)) ||
-        (p.appTag && p.appTag.toLowerCase().includes(keyword)) ||
-        (p.hobbies && p.hobbies.toLowerCase().includes(keyword))
-      );
-    }).toArray();
+  const user = await ensureLoggedIn();
+  if (!user) return;
+  // Fetch all profiles for the current user
+  const { data: profiles, error } = await supabaseClient
+    .from('profiles')
+    .select('id, nickname, match_date, status, app, summary')
+    .eq('user_id', user.id);
+  if (error) {
+    console.error(error);
+    return;
   }
-  renderProfiles(profiles);
+  let filtered = profiles;
+  if (filter) {
+    const keyword = filter.toLowerCase();
+    filtered = profiles.filter(p => {
+      return (
+        (p.nickname && p.nickname.toLowerCase().includes(keyword)) ||
+        (p.status && p.status.toLowerCase().includes(keyword)) ||
+        (p.app && p.app.toLowerCase().includes(keyword)) ||
+        (p.summary && p.summary.toLowerCase().includes(keyword))
+      );
+    });
+  }
+  renderProfiles(filtered || []);
 }
 
 function renderProfiles(profiles) {
@@ -40,25 +48,25 @@ function renderProfiles(profiles) {
   tbody.innerHTML = '';
   profiles.forEach(profile => {
     const tr = document.createElement('tr');
-    // name
+    // ニックネーム
     const nameTd = document.createElement('td');
     nameTd.textContent = profile.nickname;
     tr.appendChild(nameTd);
-    // date
+    // マッチング日
     const dateTd = document.createElement('td');
-    dateTd.textContent = profile.dateMet || '';
+    dateTd.textContent = profile.match_date || '';
     tr.appendChild(dateTd);
-    // status
+    // ステータス
     const statusTd = document.createElement('td');
-    statusTd.textContent = profile.statusTag || '';
+    statusTd.textContent = profile.status || '';
     tr.appendChild(statusTd);
-    // app
+    // アプリ名
     const appTd = document.createElement('td');
-    appTd.textContent = profile.appTag || '';
+    appTd.textContent = profile.app || '';
     tr.appendChild(appTd);
-    // summary (hobbies field repurposed)
+    // 一言でいうとどんな人？（summary）
     const summaryTd = document.createElement('td');
-    summaryTd.textContent = profile.hobbies || '';
+    summaryTd.textContent = profile.summary || '';
     tr.appendChild(summaryTd);
     // actions
     const actionTd = document.createElement('td');
@@ -74,12 +82,17 @@ function renderProfiles(profiles) {
     deleteBtn.textContent = '削除';
     deleteBtn.style.marginLeft = '0.5rem';
     deleteBtn.addEventListener('click', async () => {
-      const db = initDb();
       if (confirm(`「${profile.nickname}」を削除しますか？`)) {
-        await db.profiles.delete(profile.id);
-        // cascade delete memos and events
-        await db.memos.where('profileId').equals(profile.id).delete();
-        await db.events.where('profileId').equals(profile.id).delete();
+        const user = await ensureLoggedIn();
+        const { error } = await supabaseClient
+          .from('profiles')
+          .delete()
+          .eq('id', profile.id)
+          .eq('user_id', user.id);
+        if (error) {
+          alert(error.message);
+          return;
+        }
         refreshProfiles();
       }
     });

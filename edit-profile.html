@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
-    <script src="db.js"></script>
+    <!-- Supabase client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
     <script defer src="edit-profile.js"></script>
   </head>
   <body>
@@ -28,13 +29,13 @@
             <input type="text" id="nickname" required>
           </label>
           <label>マッチング日:
-            <input type="date" id="dateMet">
+            <input type="date" id="matchDate">
           </label>
           <label>一言でいうとどんな人？:
-            <input type="text" id="hobbies">
+            <input type="text" id="summary">
           </label>
           <label>ステータス:
-            <select id="statusTag">
+            <select id="status">
               <option value="">選択してください</option>
               <option value="本命">本命</option>
               <option value="あり">あり</option>
@@ -47,7 +48,7 @@
             </select>
           </label>
           <label>アプリ名（タグ）:
-            <input type="text" id="appTag">
+            <input type="text" id="app">
           </label>
           <button type="submit">保存</button>
           <button type="button" id="cancelBtn">キャンセル</button>
