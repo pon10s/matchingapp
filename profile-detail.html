@@ -2,39 +2,33 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>戦歴 - マッチングアプリ管理</title>
+    <title>プロフィール詳細 - マッチングアプリ管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <!-- Supabase client library and initialization -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
-    <script defer src="calendar.js"></script>
+    <script defer src="profile-detail.js"></script>
   </head>
   <body>
     <header>
-      <h1>戦歴</h1>
+      <h1>プロフィール詳細</h1>
     </header>
     <nav class="main-nav">
       <a href="index.html">ホーム</a>
-      <a href="profiles.html">プロフィール一覧</a>
+      <a href="profiles.html" class="active">プロフィール一覧</a>
       <a href="events.html">デート登録</a>
-      <a href="calendar.html" class="active">戦歴</a>
+      <a href="calendar.html">戦歴</a>
     </nav>
     <main>
-      <section>
-        <h2>戦歴</h2>
-        <table id="calendar-table">
-          <thead>
-            <tr>
-              <th>日付</th>
-              <th>相手・回数・感想</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Calendar events will be populated here -->
-          </tbody>
-        </table>
+      <section id="detail-section">
+        <!-- プロフィール詳細情報がここに表示されます -->
+      </section>
+      <section id="detail-buttons" style="display:none;">
+        <button id="editBtn">編集</button>
+        <button id="deleteBtn">削除</button>
+        <button id="addEventBtn">デート登録</button>
       </section>
     </main>
     <!-- 右下に固定表示するログアウトボタン -->

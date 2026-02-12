@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   loginForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const email = document.getElementById('login-username').value.trim();
+    const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     if (!email || !password) return;
     try {
@@ -62,14 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('register-form');
   registerForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const email = document.getElementById('register-username').value.trim();
+    const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
     if (!email || !password) return;
     try {
       // Supabase Auth で新規登録
+      // 新規登録時にメール認証のリンク先をGitHub PagesのURLに設定します。
+      // emailRedirectTo は Supabase Auth でメール確認リンクのリダイレクト先を指定するオプションです。
       const { error } = await supabaseClient.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          emailRedirectTo: 'https://pon10s.github.io/matchingapp/'
+        }
       });
       if (error) {
         alert(error.message);

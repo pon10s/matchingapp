@@ -19,7 +19,7 @@ async function refreshCalendar() {
   }
   const { data: profiles, error: prError } = await supabaseClient
     .from('profiles')
-    .select('id, nickname')
+    .select('id, name')
     .eq('user_id', user.id);
   if (prError) {
     console.error(prError);
@@ -52,7 +52,7 @@ async function refreshCalendar() {
     // 感想があれば日本語のかぎ括弧で追加
     const notePart = ev.comment ? `「${ev.comment}」` : '';
     // 名前と回数の間に全角スペースを挿入
-    const label = `${profile ? profile.nickname : ''}　${ev.count}回目${notePart}`;
+    const label = `${profile ? profile.name : ''}　${ev.count}回目${notePart}`;
     eventsByDate[date].push(label);
   });
   renderCalendar(eventsByDate);

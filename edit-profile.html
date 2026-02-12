@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>プロフィール編集 - マッチングアプリ管理</title>
+    <title>プロフィール登録／編集 - マッチングアプリ管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
@@ -19,37 +19,73 @@
       <a href="index.html">ホーム</a>
       <a href="profiles.html" class="active">プロフィール一覧</a>
       <a href="events.html">デート登録</a>
-      <a href="calendar.html">デートのあしあと</a>
+      <a href="calendar.html">戦歴</a>
     </nav>
     <main>
       <section>
         <form id="profile-form">
           <input type="hidden" id="profileId" value="">
-          <label>ニックネーム:
-            <input type="text" id="nickname" required>
+          <!-- 名前 -->
+          <label>名前:
+            <input type="text" id="name" required placeholder="お相手の名前を入力">
           </label>
-          <label>マッチング日:
-            <input type="date" id="matchDate">
+          <!-- 年齢 -->
+          <label>年齢:
+            <input type="number" id="age" placeholder="年齢">
           </label>
-          <label>一言でいうとどんな人？:
-            <input type="text" id="summary">
+          <!-- 身長 -->
+          <label>身長 (cm):
+            <input type="number" id="height" placeholder="身長">
           </label>
+          <!-- 学歴 -->
+          <label>学歴:
+            <input type="text" id="education" placeholder="最終学歴や出身校">
+          </label>
+          <!-- 年収 -->
+          <label>年収:
+            <input type="number" id="income" placeholder="年収(万円など)">
+          </label>
+          <!-- 職業 -->
+          <label>職業:
+            <input type="text" id="occupation" placeholder="職業">
+          </label>
+          <!-- 住み -->
+          <label>住み:
+            <input type="text" id="residence" placeholder="居住地">
+          </label>
+          <!-- ステータス -->
           <label>ステータス:
             <select id="status">
               <option value="">選択してください</option>
               <option value="本命">本命</option>
               <option value="あり">あり</option>
               <option value="わからない">わからない</option>
-              <option value="キープ">キープ</option>
-              <option value="なし">なし</option>
-              <option value="セフレ">セフレ</option>
-              <option value="ネタ">ネタ</option>
+              <option value="ビミョウ">ビミョウ</option>
+              <option value="大人の関係">大人の関係</option>
               <option value="友達">友達</option>
+              <option value="終了">終了</option>
             </select>
           </label>
-          <label>アプリ名（タグ）:
-            <input type="text" id="app">
+          <!-- 出会ったアプリ -->
+          <label>出会ったアプリ:
+            <input type="text" id="app" placeholder="出会ったアプリ名">
           </label>
+          <!-- どんな人 -->
+          <label>どんな人:
+            <textarea id="summary" placeholder="相手の特徴"></textarea>
+          </label>
+          <!-- メモ -->
+          <label>メモ:
+            <textarea id="memo" placeholder="自由メモ"></textarea>
+          </label>
+          <!-- 写真アップロード -->
+          <label>写真:
+            <input type="file" id="photo" accept="image/*">
+          </label>
+          <!-- プレビュー表示 -->
+          <div id="photoPreviewContainer" style="display:none; text-align:center; margin-bottom:1rem;">
+            <img id="photoPreview" src="" alt="写真プレビュー" style="max-width:100%; height:auto; border-radius:8px;">
+          </div>
           <button type="submit">保存</button>
           <button type="button" id="cancelBtn">キャンセル</button>
         </form>

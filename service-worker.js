@@ -1,6 +1,6 @@
 // キャッシュ名を更新してバージョンアップします
 // バージョンを上げることで既存のキャッシュを無効化します
-const CACHE_NAME = 'matching-app-cache-v6';
+const CACHE_NAME = 'matching-app-cache-v7';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const urlsToCache = [
   './events.html',
   './calendar.html',
   './edit-profile.html',
+  './profile-detail.html',
   './manifest.json',
   './style.css',
   // JavaScript files
@@ -18,6 +19,7 @@ const urlsToCache = [
   './events.js',
   './calendar.js',
   './edit-profile.js',
+  './profile-detail.js',
   './supabaseClient.js',
   // icons
   './icon-192.png',

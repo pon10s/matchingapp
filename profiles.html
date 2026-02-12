@@ -19,14 +19,14 @@
       <a href="index.html">ホーム</a>
       <a href="profiles.html" class="active">プロフィール一覧</a>
       <a href="events.html">デート登録</a>
-      <a href="calendar.html">デートのあしあと</a>
+      <a href="calendar.html">戦歴</a>
     </nav>
     <main>
       <section>
         <!-- 検索エリアと新規登録ボタンを別グループで配置し、ボタンを右側に寄せる -->
         <div class="profile-actions">
           <div class="search-group">
-            <input type="text" id="searchInput" placeholder="名前・タグで検索">
+            <input type="text" id="searchInput" placeholder="名前またはどんな人で検索">
             <button id="searchBtn">検索</button>
           </div>
           <button id="addNewBtn" class="new-profile-btn">＋新規登録</button>
@@ -36,12 +36,10 @@
         <table id="profiles-table">
           <thead>
             <tr>
-              <th>ニックネーム</th>
-              <th>マッチング日</th>
+              <th>名前（会った回数）</th>
               <th>ステータス</th>
-              <th>アプリ</th>
-              <th>一言でいうとどんな人？</th>
-              <th>操作</th>
+              <th>どんな人</th>
+              <th>詳細</th>
             </tr>
           </thead>
           <tbody>

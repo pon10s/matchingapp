@@ -1,46 +1,67 @@
 // Profiles listing page script
 document.addEventListener('DOMContentLoaded', async () => {
-  // ログインチェック
+  // ユーザーがログインしているか確認
   const user = await ensureLoggedIn();
   if (!user) return;
-  // Initialize events
+  // 新規登録ボタン
   document.getElementById('addNewBtn').addEventListener('click', () => {
-    // id param omitted indicates new profile
     window.location.href = 'edit-profile.html';
   });
+  // 検索ボタン
   document.getElementById('searchBtn').addEventListener('click', () => {
     const keyword = document.getElementById('searchInput').value.trim();
     refreshProfiles(keyword);
   });
-  // initial load
+  // 初期表示
   refreshProfiles();
 });
 
 async function refreshProfiles(filter = '') {
   const user = await ensureLoggedIn();
   if (!user) return;
-  // Fetch all profiles for the current user
-  const { data: profiles, error } = await supabaseClient
+  // 全プロフィールを取得
+  const { data: profiles, error: profErr } = await supabaseClient
     .from('profiles')
-    .select('id, nickname, match_date, status, app, summary')
+    .select('id, name, status, summary')
     .eq('user_id', user.id);
-  if (error) {
-    console.error(error);
+  if (profErr) {
+    console.error(profErr);
     return;
   }
+  // すべてのイベントを取得し、会った回数を算出（過去日付のみ）
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: events, error: evErr } = await supabaseClient
+    .from('events')
+    .select('profile_id, event_date')
+    .eq('user_id', user.id);
+  if (evErr) {
+    console.error(evErr);
+    return;
+  }
+  // 会った回数の辞書
+  const meetingCounts = {};
+  events.forEach(ev => {
+    if (ev.event_date <= today) {
+      meetingCounts[ev.profile_id] = (meetingCounts[ev.profile_id] || 0) + 1;
+    }
+  });
+  // 検索フィルタ
   let filtered = profiles;
   if (filter) {
     const keyword = filter.toLowerCase();
     filtered = profiles.filter(p => {
       return (
-        (p.nickname && p.nickname.toLowerCase().includes(keyword)) ||
-        (p.status && p.status.toLowerCase().includes(keyword)) ||
-        (p.app && p.app.toLowerCase().includes(keyword)) ||
+        (p.name && p.name.toLowerCase().includes(keyword)) ||
         (p.summary && p.summary.toLowerCase().includes(keyword))
       );
     });
   }
-  renderProfiles(filtered || []);
+  // 会った回数をプロファイルオブジェクトに追加
+  const enriched = filtered.map(p => ({
+    ...p,
+    count: meetingCounts[p.id] || 0
+  }));
+  renderProfiles(enriched);
 }
 
 function renderProfiles(profiles) {
@@ -48,55 +69,26 @@ function renderProfiles(profiles) {
   tbody.innerHTML = '';
   profiles.forEach(profile => {
     const tr = document.createElement('tr');
-    // ニックネーム
+    // 名前（会った回数）
     const nameTd = document.createElement('td');
-    nameTd.textContent = profile.nickname;
+    nameTd.textContent = `${profile.name} (${profile.count}回)`;
     tr.appendChild(nameTd);
-    // マッチング日
-    const dateTd = document.createElement('td');
-    dateTd.textContent = profile.match_date || '';
-    tr.appendChild(dateTd);
     // ステータス
     const statusTd = document.createElement('td');
     statusTd.textContent = profile.status || '';
     tr.appendChild(statusTd);
-    // アプリ名
-    const appTd = document.createElement('td');
-    appTd.textContent = profile.app || '';
-    tr.appendChild(appTd);
-    // 一言でいうとどんな人？（summary）
+    // どんな人
     const summaryTd = document.createElement('td');
     summaryTd.textContent = profile.summary || '';
     tr.appendChild(summaryTd);
-    // actions
+    // 詳細ボタン
     const actionTd = document.createElement('td');
-    // edit button
-    const editBtn = document.createElement('button');
-    editBtn.textContent = '編集';
-    editBtn.addEventListener('click', () => {
-      window.location.href = `edit-profile.html?id=${profile.id}`;
+    const detailBtn = document.createElement('button');
+    detailBtn.textContent = '詳細';
+    detailBtn.addEventListener('click', () => {
+      window.location.href = `profile-detail.html?id=${profile.id}`;
     });
-    actionTd.appendChild(editBtn);
-    // delete button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = '削除';
-    deleteBtn.style.marginLeft = '0.5rem';
-    deleteBtn.addEventListener('click', async () => {
-      if (confirm(`「${profile.nickname}」を削除しますか？`)) {
-        const user = await ensureLoggedIn();
-        const { error } = await supabaseClient
-          .from('profiles')
-          .delete()
-          .eq('id', profile.id)
-          .eq('user_id', user.id);
-        if (error) {
-          alert(error.message);
-          return;
-        }
-        refreshProfiles();
-      }
-    });
-    actionTd.appendChild(deleteBtn);
+    actionTd.appendChild(detailBtn);
     tr.appendChild(actionTd);
     tbody.appendChild(tr);
   });

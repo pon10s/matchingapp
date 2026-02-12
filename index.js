@@ -16,7 +16,7 @@ async function loadStatsAndPending() {
   // プロフィールとイベントを取得
   const { data: profiles, error: profError } = await supabaseClient
     .from('profiles')
-    .select('id, nickname, match_date, status, app, summary')
+    .select('id, name, status, summary')
     .eq('user_id', user.id);
   if (profError) {
     console.error(profError);
@@ -55,7 +55,7 @@ async function renderPendingList(pendingEvents, profiles) {
     return;
   }
   // ステータス選択肢
-  const statusOptions = ['', '本命', 'あり', 'わからない', 'キープ', 'なし', 'セフレ', 'ネタ', '友達'];
+  const statusOptions = ['', '本命', 'あり', 'わからない', 'ビミョウ', '大人の関係', '友達', '終了'];
   // 日付順に並び替え
   pendingEvents.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
   const user = await ensureLoggedIn();
@@ -65,7 +65,7 @@ async function renderPendingList(pendingEvents, profiles) {
     li.style.marginBottom = '1rem';
     // 日付と名前
     const header = document.createElement('div');
-    header.textContent = `${ev.event_date} ${profile ? profile.nickname : ''}`;
+    header.textContent = `${ev.event_date} ${profile ? profile.name : ''}`;
     li.appendChild(header);
     // 感想入力
     const noteInput = document.createElement('input');

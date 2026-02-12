@@ -5,7 +5,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ユーザーがログインしているか確認
   const user = await ensureLoggedIn();
   if (!user) return;
+  // プロフィールのドロップダウンを初期化
   await populateProfiles();
+  // クエリパラメータに profileId がある場合は選択状態にする
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialProfileId = urlParams.get('profileId');
+  if (initialProfileId) {
+    document.getElementById('profileSelect').value = initialProfileId;
+  }
   // フォーム送信処理
   document.getElementById('event-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -18,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (currentEventId) {
       // 編集モード：既存のイベントを更新
       const updateFields = { profile_id: profileId, event_date: date };
-      // 編集時のみコメントを保存
+      // 編集時のみ感想を保存
       updateFields.comment = note;
       const { error } = await supabaseClient
         .from('events')
@@ -30,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
     } else {
-      // 新規登録: コメントは空にして挿入
+      // 新規登録：コメントは空で挿入
       const { error } = await supabaseClient
         .from('events')
         .insert({
@@ -44,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
     }
-    // フォームをリセットし編集モード終了
+    // フォームリセットと編集モード終了
     document.getElementById('event-form').reset();
     currentEventId = null;
     document.getElementById('eventSubmitBtn').textContent = '追加';
@@ -61,9 +68,9 @@ async function populateProfiles() {
   if (!user) return;
   const { data: profiles, error } = await supabaseClient
     .from('profiles')
-    .select('id, nickname')
+    .select('id, name')
     .eq('user_id', user.id)
-    .order('nickname', { ascending: true });
+    .order('name', { ascending: true });
   if (error) {
     console.error(error);
     return;
@@ -73,7 +80,7 @@ async function populateProfiles() {
   profiles.forEach(p => {
     const option = document.createElement('option');
     option.value = p.id;
-    option.textContent = p.nickname;
+    option.textContent = p.name;
     select.appendChild(option);
   });
 }
@@ -92,7 +99,7 @@ async function refreshEvents() {
   }
   const { data: profiles, error: prError } = await supabaseClient
     .from('profiles')
-    .select('id, nickname')
+    .select('id, name')
     .eq('user_id', user.id);
   if (prError) {
     console.error(prError);
@@ -126,7 +133,7 @@ function renderEvents(events, profiles) {
     const dateTd = document.createElement('td');
     dateTd.textContent = ev.event_date;
     const nameTd = document.createElement('td');
-    nameTd.textContent = profile ? profile.nickname : '';
+    nameTd.textContent = profile ? profile.name : '';
     const countTd = document.createElement('td');
     countTd.textContent = ev.count || '';
     const noteTd = document.createElement('td');
