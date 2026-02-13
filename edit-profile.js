@@ -103,36 +103,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       memo: memoVal || null
     };
     let photoUrl = null;
-f (file) {
-  try {
-    const fileExt = file.name.split('.').pop();
-    const storagePath = `${user.id}/${profileId}/photo.${fileExt}`;
-    
-    // ファイルをArrayBufferに変換
-    const arrayBuffer = await file.arrayBuffer();
-    
-    // upload file (overwrite if exists)
-    const { error: uploadErr } = await supabaseClient.storage
-      .from('profile-photos')
-      .upload(storagePath, arrayBuffer, { 
-        upsert: true,
-        contentType: file.type  // ← これも追加すると良い
-      });
-    
-    if (uploadErr) {
-      console.error(uploadErr);
-      alert('写真のアップロードに失敗しました');
-    } else {
-      const { data: publicData } = supabaseClient.storage
-        .from('profile-photos')
-        .getPublicUrl(storagePath);
-      photoUrl = publicData.publicUrl;
+    if (file) {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const storagePath = `${user.id}/${profileId}/photo.${fileExt}`;
+        
+        // ファイルをArrayBufferに変換
+        const arrayBuffer = await file.arrayBuffer();
+        
+        // upload file (overwrite if exists)
+        const { error: uploadErr } = await supabaseClient.storage
+          .from('profile-photos')
+          .upload(storagePath, arrayBuffer, { 
+            upsert: true,
+            contentType: file.type  // ← これも追加すると良い
+          });
+        
+        if (uploadErr) {
+          console.error(uploadErr);
+          alert('写真のアップロードに失敗しました');
+        } else {
+          const { data: publicData } = supabaseClient.storage
+            .from('profile-photos')
+            .getPublicUrl(storagePath);
+          photoUrl = publicData.publicUrl;
+        }
+      } catch (e) {
+        console.error(e);
+        alert('ファイル処理中にエラーが発生しました');
+      }
     }
-  } catch (e) {
-    console.error(e);
-    alert('ファイル処理中にエラーが発生しました');
-  }
-}
     if (photoUrl) {
       data.photo_url = photoUrl;
     }
