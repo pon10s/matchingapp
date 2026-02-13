@@ -19,33 +19,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function refreshProfiles(filter = '') {
   const user = await ensureLoggedIn();
   if (!user) return;
-  // 全プロフィールを取得
+  // プロフィールを取得（写真URLを含む）
   const { data: profiles, error: profErr } = await supabaseClient
     .from('profiles')
-    .select('id, name, status, summary')
+    .select('id, name, status, summary, photo_url')
     .eq('user_id', user.id);
   if (profErr) {
     console.error(profErr);
     return;
   }
-  // すべてのイベントを取得し、会った回数を算出（過去日付のみ）
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: events, error: evErr } = await supabaseClient
-    .from('events')
-    .select('profile_id, event_date')
-    .eq('user_id', user.id);
-  if (evErr) {
-    console.error(evErr);
-    return;
-  }
-  // 会った回数の辞書
-  const meetingCounts = {};
-  events.forEach(ev => {
-    if (ev.event_date <= today) {
-      meetingCounts[ev.profile_id] = (meetingCounts[ev.profile_id] || 0) + 1;
-    }
-  });
-  // 検索フィルタ
   let filtered = profiles;
   if (filter) {
     const keyword = filter.toLowerCase();
@@ -56,12 +38,7 @@ async function refreshProfiles(filter = '') {
       );
     });
   }
-  // 会った回数をプロファイルオブジェクトに追加
-  const enriched = filtered.map(p => ({
-    ...p,
-    count: meetingCounts[p.id] || 0
-  }));
-  renderProfiles(enriched);
+  renderProfiles(filtered);
 }
 
 function renderProfiles(profiles) {
@@ -69,11 +46,32 @@ function renderProfiles(profiles) {
   tbody.innerHTML = '';
   profiles.forEach(profile => {
     const tr = document.createElement('tr');
-    // 名前（会った回数）
-    const nameTd = document.createElement('td');
-    nameTd.textContent = `${profile.name} (${profile.count}回)`;
-    tr.appendChild(nameTd);
-    // ステータス
+    // 人物列: アバターと名前
+    const personTd = document.createElement('td');
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    // avatar
+    if (profile.photo_url) {
+      const avatarDiv = document.createElement('div');
+      avatarDiv.className = 'avatar';
+      const img = document.createElement('img');
+      img.src = profile.photo_url;
+      img.alt = profile.name;
+      avatarDiv.appendChild(img);
+      wrapper.appendChild(avatarDiv);
+    } else {
+      const avatarDiv = document.createElement('div');
+      avatarDiv.className = 'avatar-placeholder';
+      avatarDiv.textContent = profile.name ? profile.name.charAt(0) : '';
+      wrapper.appendChild(avatarDiv);
+    }
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = profile.name;
+    wrapper.appendChild(nameSpan);
+    personTd.appendChild(wrapper);
+    tr.appendChild(personTd);
+    // ステータス列
     const statusTd = document.createElement('td');
     statusTd.textContent = profile.status || '';
     tr.appendChild(statusTd);

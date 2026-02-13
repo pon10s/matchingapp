@@ -107,31 +107,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const fileExt = file.name.split('.').pop();
         const storagePath = `${user.id}/${profileId}/photo.${fileExt}`;
-        
-        // ファイルをそのまま使用（Blob形式）
+        // upload file (overwrite if exists)
         const { error: uploadErr } = await supabaseClient.storage
           .from('profile-photos')
-          .upload(storagePath, file, { 
-            upsert: true,
-            contentType: file.type
-          });
-        
+          .upload(storagePath, file, { upsert: true });
         if (uploadErr) {
-          console.error('Upload error:', uploadErr);
-          alert('写真のアップロードに失敗しました: ' + uploadErr.message);
+          console.error(uploadErr);
+          alert('写真のアップロードに失敗しました');
         } else {
           const { data: publicData } = supabaseClient.storage
             .from('profile-photos')
             .getPublicUrl(storagePath);
           photoUrl = publicData.publicUrl;
-          console.log('Upload successful:', photoUrl);
         }
       } catch (e) {
-        console.error('File processing error:', e);
-        alert('ファイル処理中にエラーが発生しました');
+        console.error(e);
       }
     }
-  if (photoUrl) {
+    if (photoUrl) {
       data.photo_url = photoUrl;
     }
     try {

@@ -63,6 +63,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   refreshEvents();
 });
 
+// 日付を "M/D(曜日)" 形式にフォーマット
+function formatDateJP(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const w = weekdays[date.getDay()];
+  return `${m}/${d}(${w})`;
+}
+
 async function populateProfiles() {
   const user = await ensureLoggedIn();
   if (!user) return;
@@ -131,7 +142,8 @@ function renderEvents(events, profiles) {
     const profile = profiles.find(p => p.id === ev.profile_id);
     const tr = document.createElement('tr');
     const dateTd = document.createElement('td');
-    dateTd.textContent = ev.event_date;
+    // 日付を日本形式に変換
+    dateTd.textContent = formatDateJP(ev.event_date);
     const nameTd = document.createElement('td');
     nameTd.textContent = profile ? profile.name : '';
     const countTd = document.createElement('td');

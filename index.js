@@ -8,6 +8,17 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadStatsAndPending();
 });
 
+// 日付を "M/D(曜日)" 形式にフォーマット
+function formatDateJP(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const w = weekdays[date.getDay()];
+  return `${m}/${d}(${w})`;
+}
+
 // 統計情報と未更新イベントリストを読み込み表示する
 async function loadStatsAndPending() {
   const user = await ensureLoggedIn();
@@ -65,7 +76,8 @@ async function renderPendingList(pendingEvents, profiles) {
     li.style.marginBottom = '1rem';
     // 日付と名前
     const header = document.createElement('div');
-    header.textContent = `${ev.event_date} ${profile ? profile.name : ''}`;
+    // 日付を日本形式に変換
+    header.textContent = `${formatDateJP(ev.event_date)} ${profile ? profile.name : ''}`;
     li.appendChild(header);
     // 感想入力
     const noteInput = document.createElement('input');

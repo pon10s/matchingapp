@@ -64,11 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
+    const confirmPw = document.getElementById('register-password-confirm').value;
     if (!email || !password) return;
+    if (password !== confirmPw) {
+      alert('パスワードが一致しません');
+      // パスワード入力欄のみリセットし、メールアドレスは保持
+      document.getElementById('register-password').value = '';
+      document.getElementById('register-password-confirm').value = '';
+      return;
+    }
     try {
       // Supabase Auth で新規登録
-      // 新規登録時にメール認証のリンク先をGitHub PagesのURLに設定します。
-      // emailRedirectTo は Supabase Auth でメール確認リンクのリダイレクト先を指定するオプションです。
       const { error } = await supabaseClient.auth.signUp({
         email,
         password,

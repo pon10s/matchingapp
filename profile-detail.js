@@ -58,7 +58,7 @@ function renderProfileDetail(profile) {
   pushRow('年齢', profile.age);
   pushRow('身長', profile.height);
   pushRow('学歴', profile.education);
-  pushRow('年収', profile.income);
+  pushRow('年収（万円）', profile.income);
   pushRow('職業', profile.occupation);
   pushRow('住み', profile.residence);
   pushRow('ステータス', profile.status);
@@ -111,5 +111,12 @@ function renderProfileDetail(profile) {
 function formatDateTime(ts) {
   if (!ts) return '-';
   const dateObj = new Date(ts);
-  return dateObj.toLocaleString('ja-JP');
+  // 年月日と時刻を短く表示（例: 2/13(水) 14:30）
+  const weekdays = ['日','月','火','水','木','金','土'];
+  const m = dateObj.getMonth() + 1;
+  const d = dateObj.getDate();
+  const w = weekdays[dateObj.getDay()];
+  const hours = dateObj.getHours().toString().padStart(2,'0');
+  const mins = dateObj.getMinutes().toString().padStart(2,'0');
+  return `${m}/${d}(${w}) ${hours}:${mins}`;
 }

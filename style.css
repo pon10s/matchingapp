@@ -3,13 +3,18 @@
   以前の配色は単調だったため、オレンジ、ブルー、ピンク、パープルなど複数の色味を取り入れました。
 */
 :root {
-  /* 新しいカラーパレット: ブルーとグレーを基調に、ピンクやサーモンオレンジをアクセントに使います */
-  --primary: #5d8df6;   /* 穏やかなブルー */
-  --secondary: #8dc8ff; /* 明るいライトブルー */
-  --tertiary: #ffb3ba;  /* ソフトピンク */
-  --accent: #f8c390;    /* サーモンオレンジ */
-  --background: #f7f8fc;/* オフホワイト〜ライトグレー */
-  --text: #2f3e4e;      /* ダークグレー */
+  /* 新しいカラーパレット: 
+     アプリ全体をもっと柔らかく自然なトーンにするため、
+     パステルブルーとグレーを基調に、ピンク・サーモンオレンジをアクセントにしています。 */
+  /* 調和の取れた淡い色味に変更。空色からピンク、サーモンへ自然にグラデーションするイメージ。*/
+  /* 新しい淡いカラーパレット
+     パステルブルーとグレーを基調に、ほんのりピンクとベージュをアクセントにした柔らかなトーンです。*/
+  --primary: #a7cdf2;    /* パステルブルー */
+  --secondary: #dce4f7;  /* 薄いブルーグレー */
+  --tertiary: #f9dfe6;   /* ごく淡いピンク */
+  --accent: #f5e8d7;     /* ナチュラルベージュ */
+  --background: #f9fbff; /* ほぼ白に近い背景 */
+  --text: #344a62;       /* 深みのある青みがかったグレー */
 }
 
 * {
@@ -57,20 +62,23 @@ label {
 
 input, textarea, button {
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
+  padding: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-radius: 10px;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(200, 210, 230, 0.5);
   font-size: 1rem;
+  max-width: 100%;
 }
 
 /* select 要素も他の入力欄と同じスタイルを適用します */
 select {
   width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
+  padding: 0.6rem;
+  margin-bottom: 0.6rem;
+  border-radius: 10px;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(200, 210, 230, 0.5);
   font-size: 1rem;
   background-color: #ffffff;
 }
@@ -82,16 +90,17 @@ label select {
 }
 
 button {
-  background-color: var(--primary);
+  /* ボタンは輪郭線を無くし、自然なグラデーションを付ける */
+  background-image: linear-gradient(90deg, var(--primary), var(--accent));
   color: #ffffff;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 button:hover {
-  /* ボタンをホバーした際はアクセントカラーに */
-  background-color: var(--accent);
+  /* ホバー時は透明度で反応を見せる */
+  opacity: 0.9;
 }
 
 table {
@@ -100,13 +109,13 @@ table {
 }
 
 th, td {
-  border-bottom: 1px solid #dddddd;
-  padding: 0.5rem;
+  border-bottom: 1px solid rgba(220, 225, 235, 0.7);
+  padding: 0.6rem 0.5rem;
   text-align: left;
 }
 
 tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: rgba(249, 250, 253, 0.8);
 }
 
 #memo-panel {
@@ -117,6 +126,11 @@ tr:nth-child(even) {
 textarea {
   height: 100px;
   resize: vertical;
+}
+
+/* 日付入力の幅調整: 親コンテナからはみ出さないようにする */
+input[type="date"] {
+  max-width: 100%;
 }
 
 /* ---------------------------------------------
@@ -134,19 +148,19 @@ textarea {
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  border: 1px solid var(--accent);
-  background-color: var(--secondary);
+  border: none;
+  background-image: linear-gradient(90deg, var(--secondary), var(--tertiary));
   color: var(--text);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: opacity 0.2s ease;
   font-weight: bold;
   white-space: nowrap;
 }
 .main-nav a:hover {
-  background-color: var(--accent);
+  opacity: 0.85;
   color: #ffffff;
 }
 .main-nav a.active {
-  background-color: var(--primary);
+  background-image: linear-gradient(90deg, var(--primary), var(--accent));
   color: #ffffff;
 }
 
@@ -155,16 +169,16 @@ textarea {
   position: fixed;
   bottom: 1rem;
   right: 1rem;
-  background-color: #cccccc;
-  color: #333333;
+  background-color: var(--secondary);
+  color: var(--text);
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  border: 1px solid #bbbbbb;
+  border: none;
   text-decoration: none;
   z-index: 1000;
 }
 .logout-bottom:hover {
-  background-color: #bbbbbb;
+  background-color: var(--accent);
 }
 
 /* テーブルの操作ボタン列の整列 */
@@ -173,6 +187,73 @@ table td button {
   width: auto;
   margin-right: 0.5rem;
   white-space: nowrap;
+}
+
+/* ===========================
+   アバター・サムネイル表示
+   プロフィール一覧や戦歴ページで使用
+=========================== */
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+/* アバターが無い場合にグラデーションを表示 */
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-image: linear-gradient(45deg, var(--secondary), var(--tertiary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 0.8rem;
+}
+/* 戦歴ページで使用する小さいアバター */
+.small-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.small-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* 戦歴ページのイベント項目のスタイル */
+.event-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+.event-item .event-details {
+  display: flex;
+  flex-direction: column;
+}
+.event-item .event-label {
+  font-weight: bold;
+}
+.event-item .event-comment {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-top: 0.1rem;
 }
 
 /* プロフィールの検索や追加ボタンを横並びにするためのレイアウト */
@@ -203,15 +284,15 @@ table td button {
 .new-profile-btn {
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  border: 1px solid var(--accent);
-  background-color: var(--accent);
+  border: none;
+  background-image: linear-gradient(90deg, var(--primary), var(--accent));
   color: #ffffff;
   cursor: pointer;
   white-space: nowrap;
-  width: auto; /* グローバル設定を上書きして幅を自動にする */
+  width: auto;
 }
 .new-profile-btn:hover {
-  background-color: var(--primary);
+  opacity: 0.9;
 }
 
 /* 統計カードのスタイル */
@@ -222,11 +303,11 @@ table td button {
 }
 .card {
   flex: 1 1 200px;
-  background-color: var(--tertiary);
-  border-radius: 8px;
+  background-image: linear-gradient(180deg, var(--secondary), var(--tertiary));
+  border-radius: 12px;
   padding: 1rem;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 .card h3 {
   margin-top: 0;
@@ -248,7 +329,7 @@ table td button {
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  border: 1px solid var(--accent);
+  border: none;
   background-color: var(--secondary);
   color: var(--text);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -257,7 +338,7 @@ table td button {
 }
 .quick-actions .button:hover {
   background-color: var(--accent);
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* ステータス管理ページのラジオボタンのグループレイアウト */
@@ -288,7 +369,7 @@ table td button {
   flex: 1 1 200px;
   padding: 1rem;
   border-radius: 30px;
-  border: 1px solid var(--accent);
+  border: none;
   cursor: pointer;
   font-weight: bold;
   text-align: center;
@@ -312,7 +393,7 @@ table td button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  border: 1px solid var(--accent);
+  border: none;
   background-color: var(--secondary);
   color: var(--text);
   text-decoration: none;
@@ -321,7 +402,7 @@ table td button {
 }
 .back-btn:hover {
   background-color: var(--accent);
-  color: #ffffff;
+  color: var(--text);
 }
 
 /* -------------------------------------------------
@@ -368,4 +449,30 @@ table td button {
     width: 100%;
     margin-bottom: 0.5rem;
   }
+
+} /* end of @media (max-width: 600px) */
+
+/* -------------------------
+   プロフィールのアバター画像
+   未登録の場合は淡いグラデーションの丸いプレースホルダーを表示します
+------------------------- */
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-image: linear-gradient(135deg, var(--secondary), var(--tertiary));
+  display: inline-block;
 }
