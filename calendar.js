@@ -1,4 +1,4 @@
-// Calendar page script: simple list of events grouped by date
+// Calendar page script: group events by year and date
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await ensureLoggedIn();
   if (!user) return;
@@ -13,6 +13,13 @@ function formatDateJP(dateStr) {
   const d = date.getDate();
   const w = weekdays[date.getDay()];
   return `${m}/${d}(${w})`;
+}
+
+// 回数を日本語表記に変換 (1: 初回, 2: 2回目...)
+function formatCountJp(count) {
+  if (!count) return '';
+  if (count === 1) return '初回';
+  return `${count}回目`;
 }
 
 async function refreshCalendar() {
@@ -67,20 +74,32 @@ async function refreshCalendar() {
 function renderCalendar(eventsByDate) {
   const tbody = document.querySelector('#calendar-table tbody');
   tbody.innerHTML = '';
-  // 日付順にソート
+  // 日付順にソートしたキーから年単位でグループ化
   const sortedDates = Object.keys(eventsByDate).sort((a, b) => new Date(a) - new Date(b));
+  let currentYear = null;
   sortedDates.forEach(dateKey => {
+    const dateObj = new Date(dateKey);
+    const year = dateObj.getFullYear();
+    if (year !== currentYear) {
+      currentYear = year;
+      // 年度の行を追加
+      const yearTr = document.createElement('tr');
+      const yearTd = document.createElement('td');
+      yearTd.colSpan = 2;
+      yearTd.textContent = `${year}年`;
+      yearTd.style.fontWeight = 'bold';
+      yearTd.style.backgroundColor = 'rgba(220, 225, 235, 0.5)';
+      yearTr.appendChild(yearTd);
+      tbody.appendChild(yearTr);
+    }
     const formattedDate = formatDateJP(dateKey);
     const events = eventsByDate[dateKey];
     events.forEach((ev, index) => {
       const tr = document.createElement('tr');
-      // 日付列: 最初のイベントのみ表示、それ以外は空白
       const dateTd = document.createElement('td');
       dateTd.textContent = index === 0 ? formattedDate : '';
       tr.appendChild(dateTd);
-      // 詳細列
       const detailTd = document.createElement('td');
-      // イベントアイテムを構築
       const itemDiv = document.createElement('div');
       itemDiv.className = 'event-item';
       // 小さなアバター
@@ -98,12 +117,11 @@ function renderCalendar(eventsByDate) {
         avatar.style.backgroundImage = 'linear-gradient(45deg, var(--secondary), var(--tertiary))';
       }
       itemDiv.appendChild(avatar);
-      // ラベルとコメント
       const detailsDiv = document.createElement('div');
       detailsDiv.className = 'event-details';
       const labelSpan = document.createElement('span');
       labelSpan.className = 'event-label';
-      labelSpan.textContent = `${ev.name}　${ev.count}回目`;
+      labelSpan.textContent = `${ev.name}　${formatCountJp(ev.count)}`;
       detailsDiv.appendChild(labelSpan);
       if (ev.comment) {
         const commentDiv = document.createElement('div');

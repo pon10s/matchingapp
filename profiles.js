@@ -46,6 +46,11 @@ function renderProfiles(profiles) {
   tbody.innerHTML = '';
   profiles.forEach(profile => {
     const tr = document.createElement('tr');
+    tr.classList.add('profile-row');
+    // 行全体をクリック可能にして詳細画面へ
+    tr.addEventListener('click', () => {
+      window.location.href = `profile-detail.html?id=${profile.id}`;
+    });
     // 人物列: アバターと名前
     const personTd = document.createElement('td');
     const wrapper = document.createElement('div');
@@ -63,6 +68,7 @@ function renderProfiles(profiles) {
     } else {
       const avatarDiv = document.createElement('div');
       avatarDiv.className = 'avatar-placeholder';
+      // プレースホルダーには頭文字を表示
       avatarDiv.textContent = profile.name ? profile.name.charAt(0) : '';
       wrapper.appendChild(avatarDiv);
     }
@@ -78,16 +84,12 @@ function renderProfiles(profiles) {
     // どんな人
     const summaryTd = document.createElement('td');
     summaryTd.textContent = profile.summary || '';
+    // 長文の場合は折り返しつつ最大2行程度で省略
+    summaryTd.style.maxWidth = '100%';
+    summaryTd.style.whiteSpace = 'normal';
+    summaryTd.style.overflow = 'hidden';
+    summaryTd.style.textOverflow = 'ellipsis';
     tr.appendChild(summaryTd);
-    // 詳細ボタン
-    const actionTd = document.createElement('td');
-    const detailBtn = document.createElement('button');
-    detailBtn.textContent = '詳細';
-    detailBtn.addEventListener('click', () => {
-      window.location.href = `profile-detail.html?id=${profile.id}`;
-    });
-    actionTd.appendChild(detailBtn);
-    tr.appendChild(actionTd);
     tbody.appendChild(tr);
   });
 }

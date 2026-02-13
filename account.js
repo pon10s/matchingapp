@@ -27,10 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const pwForm = document.getElementById('password-form');
   pwForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const oldPw = document.getElementById('old-password').value;
     const newPw = document.getElementById('new-password').value;
     const confirmPw = document.getElementById('new-password-confirm').value;
-    if (!oldPw || !newPw) return;
+    if (!newPw) return;
     if (newPw !== confirmPw) {
       alert('パスワードが一致しません');
       document.getElementById('new-password').value = '';
@@ -38,26 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     try {
-      // 現在のパスワードが正しいかを確認するため、再認証する
-      const { data: userData, error: userErr } = await supabaseClient.auth.getUser();
-      if (userErr || !userData || !userData.user) {
-        throw userErr || new Error('ユーザー情報を取得できませんでした');
-      }
-      const email = userData.user.email;
-      // 現在のパスワードでログイン（セッション確認）
-      const { error: signInError } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password: oldPw
-      });
-      if (signInError) {
-        alert('現在のパスワードが正しくありません');
-        document.getElementById('old-password').value = '';
-        return;
-      }
-      // 新しいパスワードに更新
-      const { error: updErr } = await supabaseClient.auth.updateUser({ password: newPw });
-      if (updErr) {
-        alert(updErr.message);
+      const { data, error } = await supabaseClient.auth.updateUser({ password: newPw });
+      if (error) {
+        alert(error.message);
         return;
       }
       alert('パスワードを更新しました。再度ログインが必要な場合があります。');

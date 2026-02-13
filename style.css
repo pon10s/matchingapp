@@ -108,6 +108,23 @@ table {
   border-collapse: collapse;
 }
 
+/* プロフィール一覧: 列幅を調整し「どんな人」の表示領域を拡大。
+   1列目(アバター+名前)は固定幅サムネを含むためやや狭く、
+   2列目(ステータス)は中間、3列目(どんな人)を広めに割り当てます。*/
+#profiles-table td:nth-child(1) {
+  width: 25%;
+}
+#profiles-table td:nth-child(2) {
+  width: 20%;
+}
+#profiles-table td:nth-child(3) {
+  width: 55%;
+  /* 長文を2行まで表示し、省略する */
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 th, td {
   border-bottom: 1px solid rgba(220, 225, 235, 0.7);
   padding: 0.6rem 0.5rem;
@@ -130,6 +147,7 @@ textarea {
 
 /* 日付入力の幅調整: 親コンテナからはみ出さないようにする */
 input[type="date"] {
+  width: 100%;
   max-width: 100%;
 }
 
@@ -293,6 +311,15 @@ table td button {
 }
 .new-profile-btn:hover {
   opacity: 0.9;
+}
+
+/* プロフィール一覧の行全体をクリック可能とするためのスタイル */
+.profile-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.profile-row:hover {
+  background-color: rgba(200, 210, 230, 0.3);
 }
 
 /* 統計カードのスタイル */

@@ -1,6 +1,6 @@
 // キャッシュ名を更新してバージョンアップします
 // バージョンを上げることで既存のキャッシュを無効化します
-const CACHE_NAME = 'matching-app-cache-v7';
+const CACHE_NAME = 'matching-app-cache-v8';
 const urlsToCache = [
   './',
   './index.html',
@@ -24,6 +24,11 @@ const urlsToCache = [
   // icons
   './icon-192.png',
   './icon-512.png'
+  ,
+  // account and reset pages
+  './account.html',
+  './account.js',
+  './reset.html'
 ];
 
 self.addEventListener('install', event => {

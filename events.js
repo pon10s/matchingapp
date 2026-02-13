@@ -56,6 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentEventId = null;
     document.getElementById('eventSubmitBtn').textContent = '追加';
     document.getElementById('commentField').style.display = 'none';
+    const indicator = document.getElementById('editingIndicator');
+    if (indicator) indicator.style.display = 'none';
     refreshEvents();
   });
   // 初期状態では感想入力欄を隠す
@@ -72,6 +74,13 @@ function formatDateJP(dateStr) {
   const d = date.getDate();
   const w = weekdays[date.getDay()];
   return `${m}/${d}(${w})`;
+}
+
+// 回数を日本語表記に変換 (1: 初回, 2: 2回目...)
+function formatCountJp(count) {
+  if (!count) return '';
+  if (count === 1) return '初回';
+  return `${count}回目`;
 }
 
 async function populateProfiles() {
@@ -147,7 +156,7 @@ function renderEvents(events, profiles) {
     const nameTd = document.createElement('td');
     nameTd.textContent = profile ? profile.name : '';
     const countTd = document.createElement('td');
-    countTd.textContent = ev.count || '';
+    countTd.textContent = formatCountJp(ev.count);
     const noteTd = document.createElement('td');
     noteTd.textContent = ev.comment || '';
     // 操作列: 編集・削除
@@ -164,6 +173,11 @@ function renderEvents(events, profiles) {
       document.getElementById('eventSubmitBtn').textContent = '更新';
       // 感想入力欄を表示
       document.getElementById('commentField').style.display = 'block';
+      // 編集インジケーターを表示
+      const indicator = document.getElementById('editingIndicator');
+      if (indicator) indicator.style.display = 'block';
+      // フォームが画面中央に来るようスクロール
+      document.getElementById('event-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
     actionTd.appendChild(editBtn);
     const deleteBtn = document.createElement('button');
@@ -187,6 +201,8 @@ function renderEvents(events, profiles) {
           document.getElementById('event-form').reset();
           document.getElementById('eventSubmitBtn').textContent = '追加';
           document.getElementById('commentField').style.display = 'none';
+          const indicator = document.getElementById('editingIndicator');
+          if (indicator) indicator.style.display = 'none';
         }
         refreshEvents();
       }
