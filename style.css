@@ -147,8 +147,8 @@ textarea {
 
 /* 日付入力の幅調整: 親コンテナからはみ出さないようにする */
 input[type="date"] {
-  width: 90%;
-  max-width: 90%;
+  width: 95%;
+  max-width: 95%;
   box-sizing: border-box;
 }
 
