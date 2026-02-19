@@ -38,6 +38,15 @@ async function refreshProfiles(filter = '') {
       );
     });
   }
+  // ステータス順にソート
+  const statusOrder = ['本命', 'あり', 'わからない', 'ビミョウ', '大人の関係', '友達', '終了'];
+  filtered.sort((a, b) => {
+    const aIdx = statusOrder.indexOf(a.status || '');
+    const bIdx = statusOrder.indexOf(b.status || '');
+    const aOrder = aIdx === -1 ? 999 : aIdx;
+    const bOrder = bIdx === -1 ? 999 : bIdx;
+    return aOrder - bOrder;
+  });
   renderProfiles(filtered);
 }
 
@@ -56,6 +65,7 @@ function renderProfiles(profiles) {
     const wrapper = document.createElement('div');
     wrapper.style.display = 'flex';
     wrapper.style.alignItems = 'center';
+    wrapper.style.minHeight = '48px';
     // avatar
     if (profile.photo_url) {
       const avatarDiv = document.createElement('div');

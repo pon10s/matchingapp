@@ -62,10 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('register-form');
   registerForm.addEventListener('submit', async e => {
     e.preventDefault();
+    const nickname = document.getElementById('register-nickname').value.trim();
     const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
     const confirmPw = document.getElementById('register-password-confirm').value;
-    if (!email || !password) return;
+    if (!nickname || !email || !password) return;
     if (password !== confirmPw) {
       alert('パスワードが一致しません');
       // パスワード入力欄のみリセットし、メールアドレスは保持
@@ -79,7 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
         email,
         password,
         options: {
-          emailRedirectTo: 'https://pon10s.github.io/matchingapp/'
+          emailRedirectTo: 'https://pon10s.github.io/matchingapp/',
+          data: {
+            nickname: nickname
+          }
         }
       });
       if (error) {

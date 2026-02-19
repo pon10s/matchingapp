@@ -112,7 +112,7 @@ async function refreshEvents() {
     .from('events')
     .select('id, profile_id, event_date, comment')
     .eq('user_id', user.id)
-    .order('event_date', { ascending: true });
+    .order('event_date', { ascending: false });
   if (evError) {
     console.error(evError);
     return;
@@ -157,12 +157,10 @@ function renderEvents(events, profiles) {
     nameTd.textContent = profile ? profile.name : '';
     const countTd = document.createElement('td');
     countTd.textContent = formatCountJp(ev.count);
-    const noteTd = document.createElement('td');
-    noteTd.textContent = ev.comment || '';
-    // 操作列: 編集・削除
+    // 操作列: 修正・削除
     const actionTd = document.createElement('td');
     const editBtn = document.createElement('button');
-    editBtn.textContent = '編集';
+    editBtn.textContent = '修正';
     editBtn.addEventListener('click', () => {
       // 編集モードに設定
       currentEventId = ev.id;
@@ -212,7 +210,6 @@ function renderEvents(events, profiles) {
     tr.appendChild(dateTd);
     tr.appendChild(nameTd);
     tr.appendChild(countTd);
-    tr.appendChild(noteTd);
     tr.appendChild(actionTd);
     tbody.appendChild(tr);
   });

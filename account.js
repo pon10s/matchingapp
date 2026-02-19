@@ -4,6 +4,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const user = await ensureLoggedIn();
   if (!user) return;
 
+  // 現在の情報を表示
+  document.getElementById('current-email').textContent = user.email || '-';
+  const nickname = user.user_metadata?.nickname || '未設定';
+  document.getElementById('current-nickname').textContent = nickname;
+
+  // ニックネーム変更フォーム
+  const nicknameForm = document.getElementById('nickname-form');
+  nicknameForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const newNickname = document.getElementById('new-nickname').value.trim();
+    if (!newNickname) return;
+    try {
+      const { data, error } = await supabaseClient.auth.updateUser({
+        data: { nickname: newNickname }
+      });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      alert('ニックネームを更新しました');
+      document.getElementById('current-nickname').textContent = newNickname;
+      nicknameForm.reset();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
   // メールアドレス変更フォーム
   const emailForm = document.getElementById('email-form');
   emailForm.addEventListener('submit', async e => {
@@ -71,9 +98,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(evErr.message);
         return;
       }
-      // sign out the user
+      // Supabaseのauth.admin.deleteUserはRPCから呼ぶ必要があるため、クライアント側ではログアウトのみ実行
       await supabaseClient.auth.signOut();
-      alert('アカウントを削除しました。ご利用ありがとうございました。');
+      alert('アカウントデータを削除しました。ご利用ありがとうございました。');
       // redirect to login
       window.location.href = 'login.html';
     } catch (err) {

@@ -24,6 +24,20 @@
     </nav>
     <main>
       <section>
+        <h2>アカウント情報</h2>
+        <p><strong>メールアドレス:</strong> <span id="current-email">-</span></p>
+        <p><strong>ニックネーム:</strong> <span id="current-nickname">-</span></p>
+      </section>
+      <section>
+        <h2>ニックネームの変更</h2>
+        <form id="nickname-form">
+          <label>新しいニックネーム:
+            <input type="text" id="new-nickname" required>
+          </label>
+          <button type="submit">ニックネームを更新</button>
+        </form>
+      </section>
+      <section>
         <h2>メールアドレスの変更</h2>
         <form id="email-form">
           <label>新しいメールアドレス:

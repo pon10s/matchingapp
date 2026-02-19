@@ -106,6 +106,9 @@ function renderProfileDetail(profile) {
   document.getElementById('addEventBtn').onclick = () => {
     window.location.href = `events.html?profileId=${profile.id}`;
   };
+  document.getElementById('backBtn').onclick = () => {
+    window.location.href = 'profiles.html';
+  };
 }
 
 function formatDateTime(ts) {

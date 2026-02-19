@@ -62,6 +62,7 @@ async function refreshCalendar() {
     if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
     const prof = profiles.find(p => p.id === ev.profile_id);
     eventsByDate[dateKey].push({
+      id: ev.id,
       name: prof ? prof.name : '',
       count: ev.count,
       comment: ev.comment,
@@ -96,6 +97,10 @@ function renderCalendar(eventsByDate) {
     const events = eventsByDate[dateKey];
     events.forEach((ev, index) => {
       const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', () => {
+        window.location.href = `edit-event.html?id=${ev.id}`;
+      });
       const dateTd = document.createElement('td');
       dateTd.textContent = index === 0 ? formattedDate : '';
       tr.appendChild(dateTd);

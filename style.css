@@ -77,10 +77,16 @@ select {
   padding: 0.6rem;
   margin-bottom: 0.6rem;
   border-radius: 10px;
-  border: none;
+  border: 1px solid #d0d0d0;
   box-shadow: inset 0 0 0 1px rgba(200, 210, 230, 0.5);
   font-size: 1rem;
   background-color: #ffffff;
+  color: var(--text);
+}
+
+/* ステータス未選択時の色 */
+select option[value=""] {
+  color: #d0d0d0;
 }
 
 /* ラベル内の select は下に配置 */
@@ -150,6 +156,7 @@ input[type="date"] {
   width: 95%;
   max-width: 95%;
   box-sizing: border-box;
+  border: 1px solid #d0d0d0;
 }
 
 /* ---------------------------------------------
