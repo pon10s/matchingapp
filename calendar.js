@@ -5,15 +5,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const user = await ensureLoggedIn();
   if (!user) return;
   
-  // 並び替えボタンのイベント
-  document.getElementById('sortDescBtn').addEventListener('click', () => {
+  // 並び替えリンクのイベント
+  document.getElementById('sortDescBtn').addEventListener('click', (e) => {
+    e.preventDefault();
     currentSortOrder = 'desc';
     document.getElementById('sortDescBtn').classList.add('active');
     document.getElementById('sortAscBtn').classList.remove('active');
     refreshCalendar();
   });
   
-  document.getElementById('sortAscBtn').addEventListener('click', () => {
+  document.getElementById('sortAscBtn').addEventListener('click', (e) => {
+    e.preventDefault();
     currentSortOrder = 'asc';
     document.getElementById('sortAscBtn').classList.add('active');
     document.getElementById('sortDescBtn').classList.remove('active');

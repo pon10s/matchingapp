@@ -533,22 +533,32 @@ table td button {
   opacity: 0.9;
 }
 
-/* 並び替えボタン */
-.sort-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  border: 1px solid #d0d0d0;
-  background-color: #ffffff;
+/* 並び替えリンク */
+.sort-link {
   color: var(--text);
-  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.5rem;
+  border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
+}
+.sort-link.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  font-weight: bold;
+}
+.sort-link:hover {
+  opacity: 0.7;
+}
+
+/* 戻るリンク */
+.back-link {
+  color: #999;
+  text-decoration: none;
   font-size: 0.9rem;
+  transition: color 0.2s ease;
 }
-.sort-btn.active {
-  background-image: linear-gradient(90deg, var(--primary), var(--accent));
-  color: #ffffff;
-  border: none;
-}
-.sort-btn:hover {
-  opacity: 0.85;
+.back-link:hover {
+  color: #666;
+  text-decoration: underline;
 }

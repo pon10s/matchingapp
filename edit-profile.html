@@ -85,7 +85,8 @@
           </label>
           <!-- プレビュー表示 -->
           <div id="photoPreviewContainer" style="display:none; text-align:center; margin-bottom:1rem;">
-            <img id="photoPreview" src="" alt="写真プレビュー" style="max-width:100%; height:auto; border-radius:8px;">
+            <canvas id="photoPreview" style="max-width:100%; border-radius:8px; cursor:crosshair;"></canvas>
+            <p style="font-size:0.85rem; color:#666; margin-top:0.5rem;">画像をドラッグしてトリミング範囲を調整</p>
           </div>
           <button type="submit">保存</button>
           <button type="button" id="cancelBtn">キャンセル</button>

@@ -1,5 +1,10 @@
 // 編集／登録用ページスクリプト
-// 新しいプロフィール項目を扱い、写真アップロードもサポートします。
+// 新しいプロフィール項目を扱い、写真アップロードとトリミングをサポートします。
+
+let cropImage = null;
+let cropX = 0;
+let cropY = 0;
+let isDragging = false;
 
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -14,19 +19,65 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cancelBtn = document.getElementById('cancelBtn');
   const photoInput = document.getElementById('photo');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
-  const photoPreview = document.getElementById('photoPreview');
+  const canvas = document.getElementById('photoPreview');
+  const ctx = canvas.getContext('2d');
+  
   // プレビュー表示用
   photoInput.addEventListener('change', () => {
     const file = photoInput.files[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      photoPreview.src = url;
-      photoPreviewContainer.style.display = 'block';
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          cropImage = img;
+          const size = Math.min(img.width, img.height);
+          cropX = (img.width - size) / 2;
+          cropY = (img.height - size) / 2;
+          canvas.width = 300;
+          canvas.height = 300;
+          drawCroppedImage();
+          photoPreviewContainer.style.display = 'block';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     } else {
-      photoPreview.src = '';
       photoPreviewContainer.style.display = 'none';
     }
   });
+  
+  // ドラッグでトリミング位置を調整
+  canvas.addEventListener('mousedown', (e) => {
+    isDragging = true;
+  });
+  
+  canvas.addEventListener('mousemove', (e) => {
+    if (isDragging && cropImage) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const size = Math.min(cropImage.width, cropImage.height);
+      cropX = Math.max(0, Math.min(cropImage.width - size, cropX + (x - 150) * 2));
+      cropY = Math.max(0, Math.min(cropImage.height - size, cropY + (y - 150) * 2));
+      drawCroppedImage();
+    }
+  });
+  
+  canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+  
+  canvas.addEventListener('mouseleave', () => {
+    isDragging = false;
+  });
+  
+  function drawCroppedImage() {
+    if (!cropImage) return;
+    const size = Math.min(cropImage.width, cropImage.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(cropImage, cropX, cropY, size, size, 0, 0, 300, 300);
+  }
   if (idParam) {
     // 編集モード
     document.getElementById('page-title').textContent = 'プロフィール編集';
@@ -53,8 +104,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('summary').value = profile.summary || '';
       document.getElementById('memo').value = profile.memo || '';
       if (profile.photo_url) {
-        photoPreview.src = profile.photo_url;
-        photoPreviewContainer.style.display = 'block';
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          cropImage = img;
+          const size = Math.min(img.width, img.height);
+          cropX = (img.width - size) / 2;
+          cropY = (img.height - size) / 2;
+          canvas.width = 300;
+          canvas.height = 300;
+          drawCroppedImage();
+          photoPreviewContainer.style.display = 'block';
+        };
+        img.src = profile.photo_url;
       }
     }
   }
@@ -103,14 +165,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       memo: memoVal || null
     };
     let photoUrl = null;
-    if (file) {
+    if (photoInput.files[0] && cropImage) {
       try {
-        const fileExt = file.name.split('.').pop();
+        // canvasからblobを生成
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+        const fileExt = 'jpg';
         const storagePath = `${user.id}/${profileId}/photo.${fileExt}`;
         // upload file (overwrite if exists)
         const { error: uploadErr } = await supabaseClient.storage
           .from('profile-photos')
-          .upload(storagePath, file, { upsert: true });
+          .upload(storagePath, blob, { upsert: true });
         if (uploadErr) {
           console.error(uploadErr);
           alert('写真のアップロードに失敗しました');
