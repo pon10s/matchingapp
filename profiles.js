@@ -78,6 +78,7 @@ function renderProfiles(profiles) {
     } else {
       const avatarDiv = document.createElement('div');
       avatarDiv.className = 'avatar-placeholder';
+      avatarDiv.style.flexShrink = '0';
       // プレースホルダーには頭文字を表示
       avatarDiv.textContent = profile.name ? profile.name.charAt(0) : '';
       wrapper.appendChild(avatarDiv);

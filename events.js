@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('commentField').style.display = 'none';
     const indicator = document.getElementById('editingIndicator');
     if (indicator) indicator.style.display = 'none';
-    alert('保存しました');
+    // 完了画面に遷移
+    window.location.href = 'event-success.html';
   });
   // 初期状態では感想入力欄を隠す
   document.getElementById('commentField').style.display = 'none';

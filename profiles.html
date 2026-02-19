@@ -24,13 +24,15 @@
     </nav>
     <main>
       <section>
-        <!-- 検索エリアと新規登録ボタンを別グループで配置し、ボタンを右側に寄せる -->
-        <div class="profile-actions">
-          <div class="search-group">
-            <input type="text" id="searchInput" placeholder="名前またはどんな人で検索">
-            <button id="searchBtn">検索</button>
-          </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h2 style="margin:0;">プロフィール一覧</h2>
           <button id="addNewBtn" class="new-profile-btn">＋新規登録</button>
+        </div>
+      </section>
+      <section>
+        <div class="search-group" style="margin-bottom:1rem;">
+          <input type="text" id="searchInput" placeholder="名前またはどんな人で検索">
+          <button id="searchBtn">検索</button>
         </div>
       </section>
       <section>

@@ -1,7 +1,25 @@
 // Calendar page script: group events by year and date
+let currentSortOrder = 'asc'; // デフォルトは昇順
+
 document.addEventListener('DOMContentLoaded', async () => {
   const user = await ensureLoggedIn();
   if (!user) return;
+  
+  // 並び替えボタンのイベント
+  document.getElementById('sortDescBtn').addEventListener('click', () => {
+    currentSortOrder = 'desc';
+    document.getElementById('sortDescBtn').classList.add('active');
+    document.getElementById('sortAscBtn').classList.remove('active');
+    refreshCalendar();
+  });
+  
+  document.getElementById('sortAscBtn').addEventListener('click', () => {
+    currentSortOrder = 'asc';
+    document.getElementById('sortAscBtn').classList.add('active');
+    document.getElementById('sortDescBtn').classList.remove('active');
+    refreshCalendar();
+  });
+  
   refreshCalendar();
 });
 
@@ -76,7 +94,13 @@ function renderCalendar(eventsByDate) {
   const tbody = document.querySelector('#calendar-table tbody');
   tbody.innerHTML = '';
   // 日付順にソートしたキーから年単位でグループ化
-  const sortedDates = Object.keys(eventsByDate).sort((a, b) => new Date(a) - new Date(b));
+  const sortedDates = Object.keys(eventsByDate).sort((a, b) => {
+    if (currentSortOrder === 'asc') {
+      return new Date(a) - new Date(b);
+    } else {
+      return new Date(b) - new Date(a);
+    }
+  });
   let currentYear = null;
   sortedDates.forEach(dateKey => {
     const dateObj = new Date(dateKey);
