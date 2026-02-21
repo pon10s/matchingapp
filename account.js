@@ -165,40 +165,9 @@ async function loadExternalSettings(user) {
     alert(`友だち追加すると自動で連携されます。\n\n連携が完了したら、このページをリロードしてください。`);
   });
   
-  // LINEテストメッセージ送信
-  lineTestBtn.addEventListener('click', async () => {
-    if (!settings || !settings.line_user_id) {
-      alert('LINE連携が完了していません。');
-      return;
-    }
-    
-    // Supabase Functionを経由してメッセージ送信
-    try {
-      const response = await fetch(`${supabaseClient.supabaseUrl}/functions/v1/line-test-message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseClient.supabaseKey}`
-        },
-        body: JSON.stringify({
-          line_user_id: settings.line_user_id
-        })
-      });
-      
-      if (response.ok) {
-        alert('テストメッセージを送信しました！');
-      } else {
-        alert('送信に失敗しました。');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('送信に失敗しました。');
-    }
-  });
-  
   // LINE連携解除ボタン
   lineDisconnectBtn.addEventListener('click', async () => {
-    if (!confirm('LINE連携を解除しますか？')) return;
+    if (!confirm('LINE連携を解除しますか？\n\n再連携する場合は、解除後に「連携する」ボタンをクリックしてください。')) return;
     
     const { error } = await supabaseClient
       .from('user_settings')
