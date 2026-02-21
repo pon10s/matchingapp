@@ -20,3 +20,6 @@ CREATE POLICY "Users can view own codes" ON line_connection_codes
 
 CREATE POLICY "Users can insert own codes" ON line_connection_codes
   FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own codes" ON line_connection_codes
+  FOR DELETE USING (auth.uid() = user_id);

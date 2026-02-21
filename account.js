@@ -187,6 +187,12 @@ async function loadExternalSettings(user) {
       return;
     }
     
+    // 使用済みコードを削除
+    await supabaseClient
+      .from('line_connection_codes')
+      .delete()
+      .eq('user_id', user.id);
+    
     alert('LINE連携を解除しました。');
     location.reload();
   });
