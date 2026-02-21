@@ -214,7 +214,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           const { data: publicData } = supabaseClient.storage
             .from('profile-photos')
             .getPublicUrl(storagePath);
-          photoUrl = publicData.publicUrl;
+          // キャッシュバスターを追加
+          photoUrl = `${publicData.publicUrl}?t=${Date.now()}`;
         }
       } catch (e) {
         console.error(e);
