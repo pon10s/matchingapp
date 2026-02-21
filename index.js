@@ -21,9 +21,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadStatsAndPending();
   
   // タブ切替
-  document.querySelectorAll('.chart-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  const chartTabs = document.querySelectorAll('.chart-tab');
+  chartTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      chartTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       currentChartType = tab.dataset.chart;
       drawChart();

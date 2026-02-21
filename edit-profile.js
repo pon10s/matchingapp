@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         photoPreview.style.display = 'block';
         
         // 画像読み込み後にCropperを初期化
-        photoPreview.onload = () => {
+        setTimeout(() => {
           cropper = new Cropper(photoPreview, {
             aspectRatio: 1,
             viewMode: 1,
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cropBoxResizable: true,
             toggleDragModeOnDblclick: false
           });
-        };
+        }, 100);
         croppedBlob = null;
       };
       reader.readAsDataURL(file);

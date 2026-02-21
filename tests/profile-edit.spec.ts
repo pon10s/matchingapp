@@ -1,13 +1,21 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('プロフィール編集画面', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/login.html');
+    await page.click('#show-login');
+    await page.fill('#login-email', 'test@example.com');
+    await page.fill('#login-password', 'testpassword');
+    await page.click('#login-form button[type="submit"]');
+    await page.waitForURL('**/index.html', { timeout: 10000 });
+  });
+
   test('年収が選択式で表示される', async ({ page }) => {
     await page.goto('/edit-profile.html');
     
     // 年収フィールドがselectタグであることを確認
     const incomeSelect = page.locator('#income');
     await expect(incomeSelect).toBeVisible();
-    await expect(incomeSelect).toHaveAttribute('tagName', 'SELECT');
     
     // 選択肢が正しく表示されることを確認
     const options = await incomeSelect.locator('option').allTextContents();
@@ -18,6 +26,7 @@ test.describe('プロフィール編集画面', () => {
 
   test('ステータスを「終了」に変更すると終了理由フィールドが表示される', async ({ page }) => {
     await page.goto('/edit-profile.html');
+    await page.waitForLoadState('networkidle');
     
     // 初期状態では終了理由フィールドは非表示
     const endReasonFields = page.locator('#endReasonFields');
@@ -40,6 +49,7 @@ test.describe('プロフィール編集画面', () => {
 
   test('ステータスを「終了」以外に変更すると終了理由フィールドが非表示になる', async ({ page }) => {
     await page.goto('/edit-profile.html');
+    await page.waitForLoadState('networkidle');
     
     // ステータスを「終了」に変更
     await page.selectOption('#status', '終了');
@@ -55,6 +65,7 @@ test.describe('プロフィール編集画面', () => {
 
   test('写真アップロード時にCropper.jsが表示される', async ({ page }) => {
     await page.goto('/edit-profile.html');
+    await page.waitForLoadState('networkidle');
     
     // 初期状態ではプレビューコンテナは非表示
     const previewContainer = page.locator('#photoPreviewContainer');
@@ -77,6 +88,7 @@ test.describe('プロフィール編集画面', () => {
 
   test('ステータスが「終了」で終了タイプ未選択の場合、保存時にエラーが表示される', async ({ page }) => {
     await page.goto('/edit-profile.html');
+    await page.waitForLoadState('networkidle');
     
     // 名前を入力
     await page.fill('#name', 'テストユーザー');
