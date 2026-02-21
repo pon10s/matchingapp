@@ -6,6 +6,11 @@ const CONFIG = {
   // ここにあなたのAPIキーを貼り付けてください
   GEMINI_API_KEY: 'YOUR_GEMINI_API_KEY_HERE',
   
+  // LINE Messaging API（運営者のキー）
+  LINE_CHANNEL_ACCESS_TOKEN: 'YOUR_LINE_CHANNEL_ACCESS_TOKEN_HERE',  // ← チャネルアクセストークンを貼り付け
+  LINE_CHANNEL_SECRET: 'YOUR_LINE_CHANNEL_SECRET_HERE',
+  LINE_CHANNEL_ID: 'YOUR_LINE_CHANNEL_ID_HERE',
+  
   // その他の設定
   APP_NAME: 'マッチングアプリ管理システム',
   VERSION: '1.0.0'

@@ -122,57 +122,59 @@ async function loadExternalSettings(user) {
   
   // LINE連携状況
   const lineStatus = document.getElementById('line-status');
+  const lineNotConnected = document.getElementById('line-not-connected');
+  const lineConnected = document.getElementById('line-connected');
   const lineConnectBtn = document.getElementById('line-connect-btn');
+  const lineTestBtn = document.getElementById('line-test-btn');
   const lineDisconnectBtn = document.getElementById('line-disconnect-btn');
   
-  if (settings && settings.line_notify_enabled) {
+  if (settings && settings.line_user_id) {
     lineStatus.textContent = '状態: 連携済み';
     lineStatus.style.color = '#4caf50';
-    lineDisconnectBtn.style.display = 'inline-block';
+    lineNotConnected.style.display = 'none';
+    lineConnected.style.display = 'block';
   } else {
     lineStatus.textContent = '状態: 未連携';
     lineStatus.style.color = '#999';
-    lineConnectBtn.style.display = 'inline-block';
+    lineNotConnected.style.display = 'block';
+    lineConnected.style.display = 'none';
   }
   
   // LINE連携ボタン
   lineConnectBtn.addEventListener('click', async () => {
-    const token = prompt('LINE Notifyトークンを入力してください。\n\nトークンの取得方法：\n1. https://notify-bot.line.me/my/ にアクセス\n2. 「トークンを発行する」をクリック\n3. トークン名と送信先を選択\n4. 発行されたトークンをコピー');
+    // ワンタイムコードを生成
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     
-    if (!token || !token.trim()) return;
-    
-    // トークンをテスト
-    try {
-      const testResponse = await fetch('https://notify-api.line.me/api/status', {
-        headers: { 'Authorization': `Bearer ${token.trim()}` }
+    // データベースに保存
+    const { error: insertError } = await supabaseClient
+      .from('line_connection_codes')
+      .insert({
+        user_id: user.id,
+        code: code
       });
-      
-      if (!testResponse.ok) {
-        alert('無効なトークンです。もう一度確認してください。');
-        return;
-      }
-      
-      // トークンを保存
-      const updateData = {
-        line_notify_token: token.trim(),
-        line_notify_enabled: true
-      };
-      
-      if (settings) {
-        await supabaseClient
-          .from('user_settings')
-          .update(updateData)
-          .eq('user_id', user.id);
-      } else {
-        await supabaseClient
-          .from('user_settings')
-          .insert({ ...updateData, user_id: user.id });
-      }
-      
-      alert('LINE連携が完了しました！');
-      location.reload();
-    } catch (error) {
-      alert('連携に失敗しました：' + error.message);
+    
+    if (insertError) {
+      alert('エラー: ' + insertError.message);
+      return;
+    }
+    
+    // LINE友だち追加URLに遷移（コードを自動送信）
+    const lineUrl = `https://line.me/R/ti/p/@840izdny?text=連携コード:${code}`;
+    window.open(lineUrl, '_blank');
+    
+    alert(`連携コード: ${code}\n\nLINE公式アカウントを友だち追加して、自動で送信されるコードを確認してください。\n\n連携が完了したら、このページを更新してください。`);
+  });
+  
+  // LINEテストメッセージ送信
+  lineTestBtn.addEventListener('click', async () => {
+    if (!settings || !settings.line_user_id) return;
+    
+    const success = await sendTestMessage(settings.line_user_id);
+    
+    if (success) {
+      alert('テストメッセージを送信しました！');
+    } else {
+      alert('送信に失敗しました。');
     }
   });
   
@@ -184,7 +186,7 @@ async function loadExternalSettings(user) {
       .from('user_settings')
       .update({ 
         line_notify_enabled: false,
-        line_notify_token: null 
+        line_user_id: null 
       })
       .eq('user_id', user.id);
     

@@ -9,6 +9,8 @@
     <!-- Supabase client library and initialization -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
+    <script src="config.js"></script>
+    <script src="lineHelper.js"></script>
     <script defer src="account.js"></script>
   </head>
   <body>
@@ -70,8 +72,19 @@
         <div style="margin-bottom:2rem;">
           <h3>LINE通知</h3>
           <p id="line-status">状態: 確認中...</p>
-          <button id="line-connect-btn" style="display:none;">ＬＩＮＥと連携する</button>
-          <button id="line-disconnect-btn" style="display:none; background-color:#e57373;">ＬＩＮＥ連携を解除</button>
+          <div id="line-not-connected" style="display:none;">
+            <p>以下のボタンをクリックして、LINE公式アカウントを友だち追加してください。</p>
+            <button id="line-connect-btn" style="background-color:#06c755; color:white;">ＬＩＮＥと連携する</button>
+            <p style="font-size:0.9rem; color:#666; margin-top:1rem;">
+              ※ 友だち追加後、自動で連携コードが送信されます。<br>
+              連携が完了すると、このページを更新してください。
+            </p>
+          </div>
+          <div id="line-connected" style="display:none;">
+            <p style="color:green;">✓ 連携済み</p>
+            <button id="line-test-btn" style="background-color:#06c755;">テストメッセージを送信</button>
+            <button id="line-disconnect-btn" style="background-color:#e57373; margin-left:0.5rem;">ＬＩＮＥ連携を解除</button>
+          </div>
         </div>
         
         <!-- Gemini API設定 -->
