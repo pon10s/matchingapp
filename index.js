@@ -158,7 +158,9 @@ ${recentDatesInfo.map(d => `- ${d.name}さん (${d.date}): ${d.comment}`).join('
     });
     
     if (!response.ok) {
-      throw new Error('API呼び出しに失敗しました');
+      const errorText = await response.text();
+      console.error('Gemini API error:', response.status, errorText);
+      throw new Error(`API呼び出しに失敗: ${response.status}`);
     }
     
     const data = await response.json();
