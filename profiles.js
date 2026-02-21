@@ -14,28 +14,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'edit-profile.html';
   });
   // 検索ボタン
-  document.getElementById('searchBtn').addEventListener('click', () => {
+  document.getElementById('searchBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
     const keyword = document.getElementById('searchInput').value.trim();
-    refreshProfiles(keyword);
+    await refreshProfiles(keyword);
+  });
+  
+  // Enterキーでも検索
+  document.getElementById('searchInput').addEventListener('keypress', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const keyword = document.getElementById('searchInput').value.trim();
+      await refreshProfiles(keyword);
+    }
   });
   // フィルタ適用
-  document.getElementById('applyFilter').addEventListener('click', () => {
-    applyAdvancedFilters();
+  document.getElementById('applyFilter').addEventListener('click', async () => {
+    await applyAdvancedFilters();
   });
   // フィルタクリア
-  document.getElementById('clearFilter').addEventListener('click', () => {
+  document.getElementById('clearFilter').addEventListener('click', async () => {
     document.querySelectorAll('.status-filter').forEach(cb => cb.checked = false);
     currentFilters = {};
     saveFiltersToLocalStorage();
-    refreshProfiles();
+    await refreshProfiles();
   });
   // 初期表示
   refreshProfiles();
 });
 
-async function refreshProfiles(filter = '') {
+async function refreshProfiles(keyword = '') {
   const user = await ensureLoggedIn();
   if (!user) return;
+  
   // プロフィールを取得（写真URLを含む）
   const { data: profiles, error: profErr } = await supabaseClient
     .from('profiles')
@@ -48,12 +59,12 @@ async function refreshProfiles(filter = '') {
   let filtered = profiles;
   
   // キーワードフィルタ
-  if (filter) {
-    const keyword = filter.toLowerCase();
+  if (keyword) {
+    const kw = keyword.toLowerCase();
     filtered = filtered.filter(p => {
       return (
-        (p.name && p.name.toLowerCase().includes(keyword)) ||
-        (p.summary && p.summary.toLowerCase().includes(keyword))
+        (p.name && p.name.toLowerCase().includes(kw)) ||
+        (p.summary && p.summary.toLowerCase().includes(kw))
       );
     });
   }
@@ -131,11 +142,11 @@ function renderProfiles(profiles) {
 }
 
 
-function applyAdvancedFilters() {
+async function applyAdvancedFilters() {
   const statuses = Array.from(document.querySelectorAll('.status-filter:checked')).map(cb => cb.value);
   currentFilters = { statuses };
   saveFiltersToLocalStorage();
-  refreshProfiles();
+  await refreshProfiles();
 }
 
 function saveFiltersToLocalStorage() {

@@ -6,20 +6,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!user) return;
   
   // 並び替えリンクのイベント
-  document.getElementById('sortDescBtn').addEventListener('click', (e) => {
+  document.getElementById('sortDescBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     currentSortOrder = 'desc';
     document.getElementById('sortDescBtn').classList.add('active');
     document.getElementById('sortAscBtn').classList.remove('active');
-    refreshCalendar();
+    await refreshCalendar();
   });
   
-  document.getElementById('sortAscBtn').addEventListener('click', (e) => {
+  document.getElementById('sortAscBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     currentSortOrder = 'asc';
     document.getElementById('sortAscBtn').classList.add('active');
     document.getElementById('sortDescBtn').classList.remove('active');
-    refreshCalendar();
+    await refreshCalendar();
   });
   
   refreshCalendar();
@@ -35,10 +35,9 @@ function formatDateJP(dateStr) {
   return `${m}/${d}(${w})`;
 }
 
-// 回数を日本語表記に変換 (1: 初回, 2: 2回目...)
+// 回数を日本語表記に変換 (1: 1回目, 2: 2回目...)
 function formatCountJp(count) {
   if (!count) return '';
-  if (count === 1) return '初回';
   return `${count}回目`;
 }
 
@@ -111,6 +110,7 @@ function renderCalendar(eventsByDate) {
       currentYear = year;
       // 年度の行を追加
       const yearTr = document.createElement('tr');
+      yearTr.className = 'year-row';
       const yearTd = document.createElement('td');
       yearTd.colSpan = 2;
       yearTd.textContent = `${year}年`;
