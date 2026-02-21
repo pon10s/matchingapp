@@ -18,7 +18,7 @@ jobs:
       
       - name: Create config.js from secrets
         run: |
-          cat > config.js << 'EOF'
+          cat > config.js << EOF
           const CONFIG = {
             GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}',
             LINE_CHANNEL_ACCESS_TOKEN: '${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}',
