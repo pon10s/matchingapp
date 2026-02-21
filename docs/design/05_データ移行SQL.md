@@ -10,11 +10,15 @@
 -- 年収データの移行（数値を選択肢に変換）
 UPDATE profiles
 SET income = CASE
-  WHEN income::integer < 300 THEN '300万円未満'
-  WHEN income::integer >= 300 AND income::integer < 500 THEN '300-500万円'
-  WHEN income::integer >= 500 AND income::integer < 700 THEN '500-700万円'
-  WHEN income::integer >= 700 AND income::integer < 1000 THEN '700-1000万円'
-  WHEN income::integer >= 1000 THEN '1000万円以上'
+  WHEN income::integer < 300 THEN '〜300万'
+  WHEN income::integer >= 300 AND income::integer < 500 THEN '300〜500万'
+  WHEN income::integer >= 500 AND income::integer < 700 THEN '500〜700万'
+  WHEN income::integer >= 700 AND income::integer < 1000 THEN '700〜1000万'
+  WHEN income::integer >= 1000 AND income::integer < 1500 THEN '1000〜1500万'
+  WHEN income::integer >= 1500 AND income::integer < 2000 THEN '1500〜2000万'
+  WHEN income::integer >= 2000 AND income::integer < 3000 THEN '2000〜3000万'
+  WHEN income::integer >= 3000 AND income::integer < 5000 THEN '3000〜5000万'
+  WHEN income::integer >= 5000 THEN '5000万以上'
   ELSE NULL
 END
 WHERE income IS NOT NULL 
