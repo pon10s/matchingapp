@@ -33,6 +33,12 @@ serve(async (req) => {
         console.log('Code data:', codeData, 'Error:', codeError)
         
         if (codeData) {
+          // 既存の連携を解除（同じLINE IDの古い連携）
+          await supabase
+            .from('user_settings')
+            .update({ line_user_id: null, line_notify_enabled: false })
+            .eq('line_user_id', lineUserId)
+          
           // 連携を完了
           const { error: updateError } = await supabase
             .from('user_settings')
@@ -69,23 +75,91 @@ serve(async (req) => {
         }
       }
       
-      // メッセージイベント
+      // メッセージイベント（友だち追加済みでも連携可能）
       if (event.type === 'message' && event.message.type === 'text') {
         console.log('Message event detected')
-        await fetch('https://api.line.me/v2/bot/message/reply', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
-          },
-          body: JSON.stringify({
-            replyToken: event.replyToken,
-            messages: [{
-              type: 'text',
-              text: 'メッセージを受信しました！\n\n連携は友だち追加時に自動で完了しています。'
-            }]
+        const text = event.message.text
+        
+        // 「連携」というメッセージで連携開始
+        if (text.includes('連携')) {
+          const { data: codeData } = await supabase
+            .from('line_connection_codes')
+            .select('user_id, code')
+            .eq('used', false)
+            .gte('expires_at', new Date().toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+          
+          if (codeData) {
+            // 既存の連携を解除
+            await supabase
+              .from('user_settings')
+              .update({ line_user_id: null, line_notify_enabled: false })
+              .eq('line_user_id', lineUserId)
+            
+            // 連携を完了
+            const { error: updateError } = await supabase
+              .from('user_settings')
+              .update({
+                line_user_id: lineUserId,
+                line_notify_enabled: true
+              })
+              .eq('user_id', codeData.user_id)
+            
+            await supabase
+              .from('line_connection_codes')
+              .update({ used: true })
+              .eq('code', codeData.code)
+            
+            if (!updateError) {
+              await fetch('https://api.line.me/v2/bot/message/reply', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
+                },
+                body: JSON.stringify({
+                  replyToken: event.replyToken,
+                  messages: [{
+                    type: 'text',
+                    text: '✅ 連携が完了しました！\n\nマッチングアプリ管理システムからの通知を受け取れるようになりました。\n\nアプリをリロードして確認してください。'
+                  }]
+                })
+              })
+            }
+          } else {
+            await fetch('https://api.line.me/v2/bot/message/reply', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
+              },
+              body: JSON.stringify({
+                replyToken: event.replyToken,
+                messages: [{
+                  type: 'text',
+                  text: '連携コードが見つかりません。\n\nアプリで「連携する」ボタンをクリックしてから、もう一度「連携」と送信してください。'
+                }]
+              })
+            })
+          }
+        } else {
+          await fetch('https://api.line.me/v2/bot/message/reply', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`
+            },
+            body: JSON.stringify({
+              replyToken: event.replyToken,
+              messages: [{
+                type: 'text',
+                text: 'メッセージを受信しました！\n\n連携する場合は、アプリで「連携する」ボタンをクリックしてから「連携」と送信してください。'
+              }]
+            })
           })
-        })
+        }
       }
     }
 

@@ -167,7 +167,7 @@ async function loadExternalSettings(user) {
     const lineUrl = `https://line.me/R/ti/p/@840izdny`;
     window.open(lineUrl, '_blank');
     
-    alert(`友だち追加すると自動で連携されます。\n\n連携が完了したら、このページをリロードしてください。`);
+    alert(`連携手順：\n\n1. LINEで友だち追加（済みの場合はスキップ）\n2. LINEで「連携」とメッセージ送信\n3. 連携完了メッセージを確認\n4. このページをリロード`);
   });
   
   // LINE連携解除ボタン
