@@ -120,6 +120,8 @@ async function loadExternalSettings(user) {
     .eq('user_id', user.id)
     .single();
   
+  console.log('Settings loaded:', settings);
+  
   // LINE連携状況
   const lineStatus = document.getElementById('line-status');
   const lineNotConnected = document.getElementById('line-not-connected');
@@ -127,12 +129,16 @@ async function loadExternalSettings(user) {
   const lineConnectBtn = document.getElementById('line-connect-btn');
   const lineDisconnectBtn = document.getElementById('line-disconnect-btn');
   
+  console.log('line_user_id:', settings?.line_user_id);
+  
   if (settings && settings.line_user_id) {
+    console.log('LINE連携済みと判定');
     lineStatus.textContent = '状態: 連携済み';
     lineStatus.style.color = '#4caf50';
     lineNotConnected.style.display = 'none';
     lineConnected.style.display = 'block';
   } else {
+    console.log('LINE未連携と判定');
     lineStatus.textContent = '状態: 未連携';
     lineStatus.style.color = '#999';
     lineNotConnected.style.display = 'block';
