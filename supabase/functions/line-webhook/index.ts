@@ -10,15 +10,18 @@ serve(async (req) => {
   if (req.method === 'POST') {
     const body = await req.json()
     const events = body.events || []
+    console.log('Received events:', JSON.stringify(events))
 
     for (const event of events) {
+      console.log('Processing event type:', event.type)
       const lineUserId = event.source.userId
       const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
       // 友だち追加イベント（自動連携）
       if (event.type === 'follow') {
+        console.log('Follow event detected for user:', lineUserId)
         // 最新の未使用コードを取得
-        const { data: codeData } = await supabase
+        const { data: codeData, error: codeError } = await supabase
           .from('line_connection_codes')
           .select('user_id, code')
           .eq('used', false)
@@ -26,6 +29,8 @@ serve(async (req) => {
           .order('created_at', { ascending: false })
           .limit(1)
           .single()
+        
+        console.log('Code data:', codeData, 'Error:', codeError)
         
         if (codeData) {
           // 連携を完了
@@ -36,6 +41,8 @@ serve(async (req) => {
               line_user_id: lineUserId,
               line_notify_enabled: true
             })
+          
+          console.log('Update error:', updateError)
           
           await supabase
             .from('line_connection_codes')
@@ -57,12 +64,14 @@ serve(async (req) => {
                 }]
               })
             })
+            console.log('Success message sent')
           }
         }
       }
       
       // メッセージイベント
       if (event.type === 'message' && event.message.type === 'text') {
+        console.log('Message event detected')
         await fetch('https://api.line.me/v2/bot/message/reply', {
           method: 'POST',
           headers: {
