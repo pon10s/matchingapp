@@ -158,11 +158,11 @@ async function loadExternalSettings(user) {
       return;
     }
     
-    // LINE友だち追加URLに遷移（コードを自動送信）
-    const lineUrl = `https://line.me/R/ti/p/@840izdny?text=連携コード:${code}`;
+    // LINE友だち追加URLに遷移
+    const lineUrl = `https://line.me/R/ti/p/@840izdny`;
     window.open(lineUrl, '_blank');
     
-    alert(`連携コード: ${code}\n\nLINE公式アカウントを友だち追加して、自動で送信されるコードを確認してください。\n\n連携が完了したら、このページを更新してください。`);
+    alert(`友だち追加すると自動で連携されます。\n\n連携が完了したら、このページをリロードしてください。`);
   });
   
   // LINEテストメッセージ送信
