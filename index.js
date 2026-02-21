@@ -69,9 +69,38 @@ async function loadAIAdvice(user) {
     return;
   }
   
-  // TODO: Gemini APIを呼び出してアドバイスを取得
-  // 現時点ではプレースホルダーメッセージを表示
-  adviceEl.textContent = '今日も素敵な出会いがありますように！プロフィールを更新して、気持ちを整理しましょう。';
+  adviceEl.textContent = 'アドバイスを生成中...';
+  
+  try {
+    // プロフィールデータを取得
+    const { data: profiles } = await supabaseClient
+      .from('profiles')
+      .select('name, status, app, summary')
+      .eq('user_id', user.id)
+      .limit(5);
+    
+    // Gemini API呼び出し
+    const prompt = `あなたは恋愛アドバイザーです。以下のマッチングアプリの相手情報を見て、50文字以内で前向きなアドバイスをください。\n\n${JSON.stringify(profiles, null, 2)}`;
+    
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${settings.gemini_api_key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('API呼び出しに失敗しました');
+    }
+    
+    const data = await response.json();
+    const advice = data.candidates?.[0]?.content?.parts?.[0]?.text || 'アドバイスを生成できませんでした。';
+    adviceEl.textContent = advice;
+  } catch (error) {
+    console.error(error);
+    adviceEl.textContent = 'アドバイスの生成に失敗しました。APIキーを確認してください。';
+  }
 }
 
 // 日付を "M/D(曜日)" 形式にフォーマット

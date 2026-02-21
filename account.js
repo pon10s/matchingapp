@@ -137,8 +137,43 @@ async function loadExternalSettings(user) {
   
   // LINE連携ボタン
   lineConnectBtn.addEventListener('click', async () => {
-    alert('LINE連携機能は現在開発中です。');
-    // TODO: LINE NotifyのOAuthフローを実装
+    const token = prompt('LINE Notifyトークンを入力してください。\n\nトークンの取得方法：\n1. https://notify-bot.line.me/my/ にアクセス\n2. 「トークンを発行する」をクリック\n3. トークン名と送信先を選択\n4. 発行されたトークンをコピー');
+    
+    if (!token || !token.trim()) return;
+    
+    // トークンをテスト
+    try {
+      const testResponse = await fetch('https://notify-api.line.me/api/status', {
+        headers: { 'Authorization': `Bearer ${token.trim()}` }
+      });
+      
+      if (!testResponse.ok) {
+        alert('無効なトークンです。もう一度確認してください。');
+        return;
+      }
+      
+      // トークンを保存
+      const updateData = {
+        line_notify_token: token.trim(),
+        line_notify_enabled: true
+      };
+      
+      if (settings) {
+        await supabaseClient
+          .from('user_settings')
+          .update(updateData)
+          .eq('user_id', user.id);
+      } else {
+        await supabaseClient
+          .from('user_settings')
+          .insert({ ...updateData, user_id: user.id });
+      }
+      
+      alert('LINE連携が完了しました！');
+      location.reload();
+    } catch (error) {
+      alert('連携に失敗しました：' + error.message);
+    }
   });
   
   // LINE連携解除ボタン
