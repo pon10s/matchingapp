@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="ログイン処理フロー">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="start" value="開始" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="40" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="load" value="ログイン画面表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="100" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="choice" value="ログイン/新規登録&#xa;選択画面表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="160" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="decision1" value="ログインボタン&#xa;クリック？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="240" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="showLogin" value="ログインフォーム表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="350" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="showRegister" value="新規登録フォーム表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="508" y="350" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="inputLogin" value="メールアドレス・&#xa;パスワード入力" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="410" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="inputRegister" value="ニックネーム・&#xa;メールアドレス・&#xa;パスワード入力" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="488" y="410" width="160" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="validateLogin" value="入力チェック" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="480" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="validateRegister" value="入力チェック&#xa;（パスワード一致確認）" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="508" y="490" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="apiLogin" value="Supabase Auth&#xa;signInWithPassword()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="200" y="540" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="apiRegister" value="Supabase Auth&#xa;signUp()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="508" y="560" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="decisionLoginSuccess" value="ログイン成功？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="190" y="610" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="decisionRegisterSuccess" value="登録成功？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="498" y="630" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="redirectHome" value="index.htmlへ&#xa;リダイレクト" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="200" y="710" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="alertRegisterSuccess" value="アラート表示&#xa;「登録が完了しました」" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="508" y="730" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="errorLogin" value="エラーメッセージ表示" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="60" y="630" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="errorRegister" value="エラーメッセージ表示" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="668" y="650" width="100" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="end" value="終了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="800" width="120" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

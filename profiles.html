@@ -32,6 +32,41 @@
           <input type="text" id="searchInput" placeholder="名前またはどんな人で検索">
           <button id="searchBtn">検索</button>
         </div>
+        <!-- 詳細フィルタ -->
+        <details id="advanced-filter" style="margin-bottom:1rem;">
+          <summary style="cursor:pointer; font-weight:bold;">詳細フィルタ</summary>
+          <div style="padding:1rem; background:#f9f9f9; border-radius:8px; margin-top:0.5rem;">
+            <label>ステータス:
+              <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;">
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="本命"> 本命
+                </label>
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="あり"> あり
+                </label>
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="わからない"> わからない
+                </label>
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="ビミョウ"> ビミョウ
+                </label>
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="大人の関係"> 大人の関係
+                </label>
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="友達"> 友達
+                </label>
+                <label style="display:flex; align-items:center; gap:0.2rem;">
+                  <input type="checkbox" class="status-filter" value="終了"> 終了
+                </label>
+              </div>
+            </label>
+            <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+              <button id="applyFilter">適用</button>
+              <button id="clearFilter" style="background:#ccc;">クリア</button>
+            </div>
+          </div>
+        </details>
         <!-- テーブルヘッダーをなくし、ボディのみで表示 -->
         <table id="profiles-table">
           <tbody>

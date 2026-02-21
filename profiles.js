@@ -1,8 +1,14 @@
 // Profiles listing page script
+let currentFilters = {};
+
 document.addEventListener('DOMContentLoaded', async () => {
   // ユーザーがログインしているか確認
   const user = await ensureLoggedIn();
   if (!user) return;
+  
+  // LocalStorageからフィルタ読み込み
+  loadFiltersFromLocalStorage();
+  
   // 新規登録ボタン
   document.getElementById('addNewBtn').addEventListener('click', () => {
     window.location.href = 'edit-profile.html';
@@ -11,6 +17,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('searchBtn').addEventListener('click', () => {
     const keyword = document.getElementById('searchInput').value.trim();
     refreshProfiles(keyword);
+  });
+  // フィルタ適用
+  document.getElementById('applyFilter').addEventListener('click', () => {
+    applyAdvancedFilters();
+  });
+  // フィルタクリア
+  document.getElementById('clearFilter').addEventListener('click', () => {
+    document.querySelectorAll('.status-filter').forEach(cb => cb.checked = false);
+    currentFilters = {};
+    saveFiltersToLocalStorage();
+    refreshProfiles();
   });
   // 初期表示
   refreshProfiles();
@@ -29,15 +46,23 @@ async function refreshProfiles(filter = '') {
     return;
   }
   let filtered = profiles;
+  
+  // キーワードフィルタ
   if (filter) {
     const keyword = filter.toLowerCase();
-    filtered = profiles.filter(p => {
+    filtered = filtered.filter(p => {
       return (
         (p.name && p.name.toLowerCase().includes(keyword)) ||
         (p.summary && p.summary.toLowerCase().includes(keyword))
       );
     });
   }
+  
+  // 詳細フィルタ
+  if (currentFilters.statuses && currentFilters.statuses.length > 0) {
+    filtered = filtered.filter(p => currentFilters.statuses.includes(p.status));
+  }
+  
   // ステータス順にソート
   const statusOrder = ['本命', 'あり', 'わからない', 'ビミョウ', '大人の関係', '友達', '終了'];
   filtered.sort((a, b) => {
@@ -103,4 +128,29 @@ function renderProfiles(profiles) {
     tr.appendChild(summaryTd);
     tbody.appendChild(tr);
   });
+}
+
+
+function applyAdvancedFilters() {
+  const statuses = Array.from(document.querySelectorAll('.status-filter:checked')).map(cb => cb.value);
+  currentFilters = { statuses };
+  saveFiltersToLocalStorage();
+  refreshProfiles();
+}
+
+function saveFiltersToLocalStorage() {
+  localStorage.setItem('profileFilters', JSON.stringify(currentFilters));
+}
+
+function loadFiltersFromLocalStorage() {
+  const saved = localStorage.getItem('profileFilters');
+  if (saved) {
+    currentFilters = JSON.parse(saved);
+    if (currentFilters.statuses) {
+      currentFilters.statuses.forEach(status => {
+        const cb = document.querySelector(`.status-filter[value="${status}"]`);
+        if (cb) cb.checked = true;
+      });
+    }
+  }
 }

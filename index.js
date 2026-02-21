@@ -1,11 +1,33 @@
 // ホーム画面用スクリプト
 // 統計情報の表示と更新が必要なイベントのリストアップを行います。
 
+let currentChart = null;
+let allProfiles = [];
+let allEvents = [];
+let currentPeriod = '3months';
+let currentChartType = 'status';
+
 window.addEventListener('DOMContentLoaded', async () => {
   // ログインしていない場合はログインページへリダイレクトします
   const user = await ensureLoggedIn();
   if (!user) return;
   await loadStatsAndPending();
+  
+  // タブ切替
+  document.querySelectorAll('.chart-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentChartType = tab.dataset.chart;
+      drawChart();
+    });
+  });
+  
+  // 期間フィルタ
+  document.getElementById('period-filter').addEventListener('change', (e) => {
+    currentPeriod = e.target.value;
+    drawChart();
+  });
 });
 
 // 日付を "M/D(曜日)" 形式にフォーマット
@@ -27,7 +49,7 @@ async function loadStatsAndPending() {
   // プロフィールとイベントを取得
   const { data: profiles, error: profError } = await supabaseClient
     .from('profiles')
-    .select('id, name, status, summary')
+    .select('id, name, status, summary, app')
     .eq('user_id', user.id);
   if (profError) {
     console.error(profError);
@@ -35,24 +57,31 @@ async function loadStatsAndPending() {
   }
   const { data: events, error: evError } = await supabaseClient
     .from('events')
-    .select('id, profile_id, event_date, comment, status')
+    .select('id, profile_id, event_date, comment')
     .eq('user_id', user.id);
   if (evError) {
     console.error(evError);
     return;
   }
+  
+  allProfiles = profiles || [];
+  allEvents = events || [];
+  
   // プロフィール数
-  const profilesCount = profiles ? profiles.length : 0;
+  const profilesCount = allProfiles.length;
   document.getElementById('profiles-count').textContent = `${profilesCount}人`;
   // 本日以降の予定数
-  const upcomingCount = events.filter(ev => ev.event_date >= today).length;
+  const upcomingCount = allEvents.filter(ev => ev.event_date >= today).length;
   document.getElementById('upcoming-count').textContent = `${upcomingCount}件`;
   // 未更新イベント（過去の日付かつ comment が空）
-  const pendingEvents = events.filter(ev => {
+  const pendingEvents = allEvents.filter(ev => {
     return ev.event_date < today && (!ev.comment || ev.comment.trim() === '');
   });
   document.getElementById('pending-count').textContent = `${pendingEvents.length}件`;
-  renderPendingList(pendingEvents, profiles);
+  renderPendingList(pendingEvents, allProfiles);
+  
+  // グラフ描画
+  drawChart();
 }
 
 // 更新が必要なイベントのリストを描画し、各アイテムで感想とステータスを更新できるようにする
@@ -133,4 +162,169 @@ async function renderPendingList(pendingEvents, profiles) {
     li.appendChild(updateBtn);
     pendingListEl.appendChild(li);
   }
+}
+
+
+// グラフ描画
+function drawChart() {
+  if (currentChart) {
+    currentChart.destroy();
+  }
+  
+  const ctx = document.getElementById('statsChart').getContext('2d');
+  
+  if (currentChartType === 'status') {
+    drawStatusChart(ctx);
+  } else if (currentChartType === 'monthly') {
+    drawMonthlyChart(ctx);
+  } else if (currentChartType === 'app') {
+    drawAppChart(ctx);
+  }
+}
+
+// ステータス別人数グラフ
+function drawStatusChart(ctx) {
+  const statusCount = {};
+  allProfiles.forEach(p => {
+    const status = p.status || 'わからない';
+    statusCount[status] = (statusCount[status] || 0) + 1;
+  });
+  
+  const labels = Object.keys(statusCount);
+  const data = Object.values(statusCount);
+  
+  if (labels.length === 0) return;
+  
+  currentChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+          '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right'
+        },
+        title: {
+          display: true,
+          text: 'ステータス別人数'
+        }
+      }
+    }
+  });
+}
+
+// 月別デート回数グラフ
+function drawMonthlyChart(ctx) {
+  const now = new Date();
+  let startDate;
+  
+  if (currentPeriod === '3months') {
+    startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+  } else if (currentPeriod === '6months') {
+    startDate = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+  } else if (currentPeriod === '1year') {
+    startDate = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+  } else {
+    startDate = new Date(0);
+  }
+  
+  const filteredEvents = allEvents.filter(e => new Date(e.event_date) >= startDate);
+  
+  const monthlyCount = {};
+  filteredEvents.forEach(e => {
+    const date = new Date(e.event_date);
+    const key = `${date.getFullYear()}/${date.getMonth() + 1}`;
+    monthlyCount[key] = (monthlyCount[key] || 0) + 1;
+  });
+  
+  const labels = Object.keys(monthlyCount).sort();
+  const data = labels.map(l => monthlyCount[l]);
+  
+  if (labels.length === 0) return;
+  
+  currentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'デート回数',
+        data: data,
+        borderColor: '#36A2EB',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: '月別デート回数'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
+}
+
+// アプリ別出会い数グラフ
+function drawAppChart(ctx) {
+  const appCount = {};
+  allProfiles.forEach(p => {
+    const app = p.app || '不明';
+    appCount[app] = (appCount[app] || 0) + 1;
+  });
+  
+  const labels = Object.keys(appCount);
+  const data = Object.values(appCount);
+  
+  if (labels.length === 0) return;
+  
+  currentChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '出会い数',
+        data: data,
+        backgroundColor: '#4BC0C0'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'アプリ別出会い数'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
+  });
 }

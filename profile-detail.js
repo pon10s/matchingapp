@@ -58,10 +58,15 @@ function renderProfileDetail(profile) {
   pushRow('年齢', profile.age);
   pushRow('身長', profile.height);
   pushRow('学歴', profile.education);
-  pushRow('年収（万円）', profile.income);
+  pushRow('年収', profile.income);
   pushRow('職業', profile.occupation);
   pushRow('住み', profile.residence);
   pushRow('ステータス', profile.status);
+  // 終了理由の表示（ステータスが「終了」の場合のみ）
+  if (profile.status === '終了') {
+    pushRow('終了タイプ', profile.end_reason_type);
+    pushRow('終了理由', profile.end_reason_detail);
+  }
   pushRow('出会ったアプリ', profile.app);
   pushRow('どんな人', profile.summary);
   pushRow('メモ', profile.memo);

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- Supabase client library loaded via CDN【39645647059278†L150-L215】 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Initialize Supabase client and helpers -->
@@ -40,6 +42,28 @@
             <h3>更新待ち</h3>
             <p id="pending-count">-- 件</p>
           </div>
+        </div>
+      </section>
+      <!-- 統計グラフセクション -->
+      <section>
+        <h2>統計</h2>
+        <div style="margin-bottom: 1rem;">
+          <label>期間:
+            <select id="period-filter">
+              <option value="3months">直近3ヶ月</option>
+              <option value="6months">6ヶ月</option>
+              <option value="1year">1年</option>
+              <option value="all">全期間</option>
+            </select>
+          </label>
+        </div>
+        <div class="chart-tabs">
+          <button class="chart-tab active" data-chart="status">ステータス別</button>
+          <button class="chart-tab" data-chart="monthly">月別推移</button>
+          <button class="chart-tab" data-chart="app">アプリ別</button>
+        </div>
+        <div style="position: relative; height: 400px; margin-top: 1rem;">
+          <canvas id="statsChart"></canvas>
         </div>
       </section>
       <!-- 更新が必要なイベントを表示 -->

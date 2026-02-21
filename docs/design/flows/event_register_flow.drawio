@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="デート登録フロー">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="start" value="開始" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="40" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="loadProfiles" value="Supabase&#xa;プロフィール一覧取得" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="354" y="100" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="populateSelect" value="ドロップダウンに&#xa;プロフィール設定" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="170" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="checkParam" value="URLパラメータ&#xa;profileId確認" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="240" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="selectProfile" value="該当プロフィールを&#xa;選択状態にする" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="260" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="showForm" value="デート登録フォーム表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="340" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="inputData" value="相手選択・日付入力" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="334" y="400" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="submit" value="追加ボタンクリック" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="470" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="validate" value="入力チェック&#xa;（相手・日付必須）" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="530" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="validOk" value="入力OK？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="600" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="errorMsg" value="エラーメッセージ表示" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="180" y="620" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="insertEvent" value="Supabase&#xa;イベント登録&#xa;（comment=空）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="354" y="700" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="dbSuccess" value="登録成功？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="780" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="dbError" value="エラーメッセージ表示" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="180" y="800" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="redirect" value="event-success.htmlへ&#xa;リダイレクト" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="880" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="end" value="終了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="950" width="120" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

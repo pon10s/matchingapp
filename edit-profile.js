@@ -1,10 +1,8 @@
 // 編集／登録用ページスクリプト
 // 新しいプロフィール項目を扱い、写真アップロードとトリミングをサポートします。
 
-let cropImage = null;
-let cropX = 0;
-let cropY = 0;
-let isDragging = false;
+let cropper = null;
+let croppedBlob = null;
 
 function getQueryParam(param) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -19,8 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cancelBtn = document.getElementById('cancelBtn');
   const photoInput = document.getElementById('photo');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
-  const canvas = document.getElementById('photoPreview');
-  const ctx = canvas.getContext('2d');
+  const photoPreview = document.getElementById('photoPreview');
+  const cropBtn = document.getElementById('cropBtn');
   
   // プレビュー表示用
   photoInput.addEventListener('change', () => {
@@ -28,56 +26,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          cropImage = img;
-          const size = Math.min(img.width, img.height);
-          cropX = (img.width - size) / 2;
-          cropY = (img.height - size) / 2;
-          canvas.width = 300;
-          canvas.height = 300;
-          drawCroppedImage();
-          photoPreviewContainer.style.display = 'block';
-        };
-        img.src = e.target.result;
+        photoPreview.src = e.target.result;
+        photoPreviewContainer.style.display = 'block';
+        // Cropper初期化
+        if (cropper) {
+          cropper.destroy();
+        }
+        cropper = new Cropper(photoPreview, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 1,
+          responsive: true
+        });
+        croppedBlob = null;
       };
       reader.readAsDataURL(file);
     } else {
       photoPreviewContainer.style.display = 'none';
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
     }
   });
   
-  // ドラッグでトリミング位置を調整
-  canvas.addEventListener('mousedown', (e) => {
-    isDragging = true;
-  });
-  
-  canvas.addEventListener('mousemove', (e) => {
-    if (isDragging && cropImage) {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const size = Math.min(cropImage.width, cropImage.height);
-      cropX = Math.max(0, Math.min(cropImage.width - size, cropX + (x - 150) * 2));
-      cropY = Math.max(0, Math.min(cropImage.height - size, cropY + (y - 150) * 2));
-      drawCroppedImage();
+  // トリミング決定
+  cropBtn.addEventListener('click', () => {
+    if (cropper) {
+      cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob((blob) => {
+        croppedBlob = blob;
+        alert('トリミング完了！保存してください。');
+      }, 'image/jpeg', 0.9);
     }
   });
-  
-  canvas.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
-  
-  canvas.addEventListener('mouseleave', () => {
-    isDragging = false;
-  });
-  
-  function drawCroppedImage() {
-    if (!cropImage) return;
-    const size = Math.min(cropImage.width, cropImage.height);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(cropImage, cropX, cropY, size, size, 0, 0, 300, 300);
-  }
   if (idParam) {
     // 編集モード
     document.getElementById('page-title').textContent = 'プロフィール編集';
@@ -100,26 +81,49 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('occupation').value = profile.occupation || '';
       document.getElementById('residence').value = profile.residence || '';
       document.getElementById('status').value = profile.status || '';
+      // 終了理由の読み込み
+      if (profile.end_reason_type) {
+        const radio = document.querySelector(`input[name="end_reason_type"][value="${profile.end_reason_type}"]`);
+        if (radio) radio.checked = true;
+      }
+      document.getElementById('end_reason_detail').value = profile.end_reason_detail || '';
+      // ステータスが「終了」なら終了理由フィールド表示
+      if (profile.status === '終了') {
+        document.getElementById('endReasonFields').style.display = 'block';
+      }
       document.getElementById('app').value = profile.app || '';
       document.getElementById('summary').value = profile.summary || '';
       document.getElementById('memo').value = profile.memo || '';
       if (profile.photo_url) {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          cropImage = img;
-          const size = Math.min(img.width, img.height);
-          cropX = (img.width - size) / 2;
-          cropY = (img.height - size) / 2;
-          canvas.width = 300;
-          canvas.height = 300;
-          drawCroppedImage();
-          photoPreviewContainer.style.display = 'block';
-        };
-        img.src = profile.photo_url;
+        photoPreview.src = profile.photo_url;
+        photoPreviewContainer.style.display = 'block';
+        // Cropper初期化
+        if (cropper) {
+          cropper.destroy();
+        }
+        cropper = new Cropper(photoPreview, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 1,
+          responsive: true
+        });
       }
     }
   }
+  
+  // ステータス変更時の終了理由フィールド表示/非表示
+  document.getElementById('status').addEventListener('change', (e) => {
+    const endReasonFields = document.getElementById('endReasonFields');
+    if (e.target.value === '終了') {
+      endReasonFields.style.display = 'block';
+    } else {
+      endReasonFields.style.display = 'none';
+      // 値をクリア
+      document.querySelectorAll('input[name="end_reason_type"]').forEach(r => r.checked = false);
+      document.getElementById('end_reason_detail').value = '';
+    }
+  });
+  
   // 保存処理
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -129,6 +133,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('名前は必須です');
       return;
     }
+    // ステータスが「終了」の場合、終了タイプは必須
+    const statusVal = document.getElementById('status').value;
+    if (statusVal === '終了') {
+      const endReasonType = document.querySelector('input[name="end_reason_type"]:checked');
+      if (!endReasonType) {
+        alert('終了タイプを選択してください');
+        return;
+      }
+    }
     // 数値項目
     const ageVal = document.getElementById('age').value;
     const heightVal = document.getElementById('height').value;
@@ -137,7 +150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const educationVal = document.getElementById('education').value.trim();
     const occupationVal = document.getElementById('occupation').value.trim();
     const residenceVal = document.getElementById('residence').value.trim();
-    const statusVal = document.getElementById('status').value;
     const appVal = document.getElementById('app').value.trim();
     const summaryVal = document.getElementById('summary').value.trim();
     const memoVal = document.getElementById('memo').value.trim();
@@ -156,25 +168,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       age: ageVal ? parseInt(ageVal, 10) : null,
       height: heightVal ? parseInt(heightVal, 10) : null,
       education: educationVal || null,
-      income: incomeVal ? parseInt(incomeVal, 10) : null,
+      income: incomeVal || null,
       occupation: occupationVal || null,
       residence: residenceVal || null,
       status: statusVal || null,
       app: appVal || null,
       summary: summaryVal || null,
-      memo: memoVal || null
+      memo: memoVal || null,
+      end_reason_type: statusVal === '終了' ? (document.querySelector('input[name="end_reason_type"]:checked')?.value || null) : null,
+      end_reason_detail: statusVal === '終了' ? (document.getElementById('end_reason_detail').value.trim() || null) : null
     };
     let photoUrl = null;
-    if (photoInput.files[0] && cropImage) {
+    if (croppedBlob) {
       try {
-        // canvasからblobを生成
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
         const fileExt = 'jpg';
         const storagePath = `${user.id}/${profileId}/photo.${fileExt}`;
         // upload file (overwrite if exists)
         const { error: uploadErr } = await supabaseClient.storage
           .from('profile-photos')
-          .upload(storagePath, blob, { upsert: true });
+          .upload(storagePath, croppedBlob, { upsert: true });
         if (uploadErr) {
           console.error(uploadErr);
           alert('写真のアップロードに失敗しました');

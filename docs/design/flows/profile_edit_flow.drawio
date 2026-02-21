@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="プロフィール登録・編集フロー">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="start" value="開始" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="40" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="checkId" value="URLパラメータ&#xa;id確認" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="100" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="loadProfile" value="Supabase&#xa;プロフィール取得" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="120" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="fillForm" value="フォームに値をセット" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="180" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="showForm" value="プロフィール入力フォーム表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="240" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="inputData" value="プロフィール情報入力&#xa;（名前、年齢、職業等）" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="334" y="310" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="photoUpload" value="写真選択？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="380" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="showPreview" value="Canvasにプレビュー表示" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="400" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cropAdjust" value="マウスドラッグで&#xa;トリミング位置調整" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="460" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="submit" value="保存ボタンクリック" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="540" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="validate" value="入力チェック&#xa;（名前必須）" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="600" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="validOk" value="入力OK？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="660" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="errorMsg" value="エラーメッセージ表示" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="180" y="680" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="hasPhoto" value="写真あり？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="760" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="cropImage" value="Canvasから&#xa;Blob生成（JPEG 90%）" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="770" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="uploadStorage" value="Supabase Storage&#xa;写真アップロード" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="850" width="120" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="getUrl" value="公開URL取得" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="920" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="checkMode" value="編集モード？" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="344" y="980" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="updateDb" value="Supabase&#xa;プロフィール更新" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="1000" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="insertDb" value="Supabase&#xa;プロフィール登録" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="180" y="1000" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="redirect" value="profiles.htmlへ&#xa;リダイレクト" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="1080" width="120" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="end" value="終了" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="354" y="1140" width="120" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
