@@ -57,15 +57,9 @@ async function checkLineConnection(user) {
 async function loadAIAdvice(user) {
   const adviceEl = document.getElementById('advice-content');
   
-  // Gemini APIが設定されているか確認
-  const { data: settings } = await supabaseClient
-    .from('user_settings')
-    .select('gemini_enabled, gemini_api_key')
-    .eq('user_id', user.id)
-    .single();
-  
-  if (!settings || !settings.gemini_enabled || !settings.gemini_api_key) {
-    adviceEl.textContent = 'AIアドバイス機能を使用するには、アカウント設定でGemini APIを設定してください。';
+  // 運営者のAPIキーを使用
+  if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+    adviceEl.textContent = 'AIアドバイス機能は現在設定中です。';
     return;
   }
   
@@ -75,14 +69,81 @@ async function loadAIAdvice(user) {
     // プロフィールデータを取得
     const { data: profiles } = await supabaseClient
       .from('profiles')
-      .select('name, status, app, summary')
+      .select('name, status, app, summary, age')
+      .eq('user_id', user.id);
+    
+    // イベントデータを取得
+    const { data: events } = await supabaseClient
+      .from('events')
+      .select('event_date, comment, profile_id')
       .eq('user_id', user.id)
-      .limit(5);
+      .order('event_date', { ascending: false })
+      .limit(10);
     
-    // Gemini API呼び出し
-    const prompt = `あなたは恋愛アドバイザーです。以下のマッチングアプリの相手情報を見て、50文字以内で前向きなアドバイスをください。\n\n${JSON.stringify(profiles, null, 2)}`;
+    // 進捗状況を分析
+    const today = new Date().toISOString().slice(0, 10);
+    const analysis = {
+      total: profiles?.length || 0,
+      byStatus: {},
+      upcomingDates: events?.filter(e => e.event_date >= today).length || 0,
+      recentDates: events?.filter(e => e.event_date < today).slice(0, 3) || [],
+      needsUpdate: events?.filter(e => e.event_date < today && !e.comment).length || 0
+    };
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${settings.gemini_api_key}`, {
+    profiles?.forEach(p => {
+      const status = p.status || 'わからない';
+      analysis.byStatus[status] = (analysis.byStatus[status] || 0) + 1;
+    });
+    
+    // 最近のデート情報を追加
+    const recentDatesInfo = analysis.recentDates.map(e => {
+      const profile = profiles?.find(p => p.id === e.profile_id);
+      return {
+        name: profile?.name || '不明',
+        date: e.event_date,
+        comment: e.comment || '未記入'
+      };
+    });
+    
+    // 改善されたプロンプト（ネットスラング風）
+    const prompt = `あなたは「マチアプネキ」という名前の、フレンドリーで親しみやすい恋愛アドバイザーです。
+ネットスラングや若者言葉を使って、明るく応援するキャラクターです。
+
+【キャラ設定】
+- 「～ンゴ」「～ねー」などの語尾を使う
+- 「えらい！」「がんば！」という応援表現
+- 「休んでいいのでは？」という優しい言葉
+- 「びっぐらぶ」「がんばるぞい」などの応援
+- 絶対に説教臭くならない
+- フレンドリーで親しみやすい口調
+
+【ユーザーの現在の状況】
+- 登録中の相手: ${analysis.total}人
+- ステータス別: ${JSON.stringify(analysis.byStatus)}
+- 今後の予定: ${analysis.upcomingDates}件
+- 未記入のデート: ${analysis.needsUpdate}件
+
+【最近のデート履歴】
+${recentDatesInfo.map(d => `- ${d.name}さん (${d.date}): ${d.comment}`).join('\n')}
+
+【アドバイスの方針】
+1. 未記入のデートが多い場合：「振り返り書くといいよ～」と優しく促す
+2. 本命の相手がいる場合：「びっぐらぶ！」と応援
+3. 予定がある場合：「楽しみンゴねー！」と明るく
+4. 活動が停滞している場合：「無理せずマイペースで！」と優しく
+5. 頑張っている場合：「えらい！」と褒める
+6. 疲れていそうな場合：「休んでいいのでは？」と気遣う
+
+【重要な制約】
+- 50文字以内で出力すること（必須）
+- 絶対に1文だけで終わること
+- ネットスラングを自然に使うこと
+- 明るく前向きなトーンで話すこと
+- 説教臭くならないこと
+
+上記の情報を踏まえて、マチアプネキとしてユーザーにアドバイスをください。`;
+    
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -99,7 +160,7 @@ async function loadAIAdvice(user) {
     adviceEl.textContent = advice;
   } catch (error) {
     console.error(error);
-    adviceEl.textContent = 'アドバイスの生成に失敗しました。APIキーを確認してください。';
+    adviceEl.textContent = 'アドバイスの生成に失敗しました。';
   }
 }
 
