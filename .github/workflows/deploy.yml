@@ -15,6 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Create config.js from secrets
+        run: |
+          cat > config.js << 'EOF'
+          const CONFIG = {
+            GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}',
+            LINE_CHANNEL_ACCESS_TOKEN: '${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}',
+            LINE_CHANNEL_SECRET: '${{ secrets.LINE_CHANNEL_SECRET }}',
+            LINE_CHANNEL_ID: '${{ secrets.LINE_CHANNEL_ID }}',
+            APP_NAME: 'マッチングアプリ管理システム',
+            VERSION: '1.0.0'
+          };
+          EOF
+      
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
