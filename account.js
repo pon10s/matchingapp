@@ -167,13 +167,31 @@ async function loadExternalSettings(user) {
   
   // LINEテストメッセージ送信
   lineTestBtn.addEventListener('click', async () => {
-    if (!settings || !settings.line_user_id) return;
+    if (!settings || !settings.line_user_id) {
+      alert('LINE連携が完了していません。');
+      return;
+    }
     
-    const success = await sendTestMessage(settings.line_user_id);
-    
-    if (success) {
-      alert('テストメッセージを送信しました！');
-    } else {
+    // Supabase Functionを経由してメッセージ送信
+    try {
+      const response = await fetch(`${supabaseClient.supabaseUrl}/functions/v1/line-test-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseClient.supabaseKey}`
+        },
+        body: JSON.stringify({
+          line_user_id: settings.line_user_id
+        })
+      });
+      
+      if (response.ok) {
+        alert('テストメッセージを送信しました！');
+      } else {
+        alert('送信に失敗しました。');
+      }
+    } catch (error) {
+      console.error(error);
       alert('送信に失敗しました。');
     }
   });
