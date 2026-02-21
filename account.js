@@ -125,7 +125,6 @@ async function loadExternalSettings(user) {
   const lineNotConnected = document.getElementById('line-not-connected');
   const lineConnected = document.getElementById('line-connected');
   const lineConnectBtn = document.getElementById('line-connect-btn');
-  const lineTestBtn = document.getElementById('line-test-btn');
   const lineDisconnectBtn = document.getElementById('line-disconnect-btn');
   
   if (settings && settings.line_user_id) {
