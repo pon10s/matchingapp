@@ -36,11 +36,11 @@ serve(async (req) => {
           // 連携を完了
           const { error: updateError } = await supabase
             .from('user_settings')
-            .upsert({
-              user_id: codeData.user_id,
+            .update({
               line_user_id: lineUserId,
               line_notify_enabled: true
             })
+            .eq('user_id', codeData.user_id)
           
           console.log('Update error:', updateError)
           
