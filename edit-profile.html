@@ -119,9 +119,9 @@
             <input type="file" id="photo" accept="image/*">
           </label>
           <!-- プレビュー表示 -->
-          <div id="photoPreviewContainer" style="display:none; text-align:center; margin-bottom:1rem;">
-            <img id="photoPreview" style="max-width:100%; display:block;">
-            <button type="button" id="cropBtn" style="margin-top:0.5rem;">決定</button>
+          <div id="photoPreviewContainer" style="display:none; text-align:center; margin-bottom:1rem; max-width:100%; overflow:hidden;">
+            <img id="photoPreview" style="max-width:100%; display:block; margin:0 auto;">
+            <button type="button" id="cropBtn" style="margin-top:0.5rem; width:auto;">決定</button>
           </div>
           <button type="submit">保存</button>
           <button type="button" id="cancelBtn">キャンセル</button>

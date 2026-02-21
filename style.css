@@ -339,7 +339,8 @@ table td button {
   gap: 1rem;
 }
 .card {
-  flex: 1 1 200px;
+  flex: 1 1 calc(33.333% - 1rem);
+  min-width: 120px;
   background-image: linear-gradient(180deg, var(--secondary), var(--tertiary));
   border-radius: 12px;
   padding: 1rem;
@@ -466,12 +467,20 @@ table td button {
   .search-group {
     flex-direction: column;
   }
-  /* 統計カードを縦に並べる */
+  /* 統計カードはスマホでも3つ横並びを維持 */
   .stats-cards {
-    flex-direction: column;
+    gap: 0.5rem;
   }
-  .stats-cards .card {
-    flex: 1 1 100%;
+  .card {
+    flex: 1 1 calc(33.333% - 0.5rem);
+    min-width: 100px;
+    padding: 0.5rem;
+  }
+  .card h3 {
+    font-size: 0.9rem;
+  }
+  .card p {
+    font-size: 1.1rem;
   }
   /* テーブルの文字サイズを調整して見やすくする */
   table, th, td {

@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('current-email').textContent = user.email || '-';
   const nickname = user.user_metadata?.nickname || '未設定';
   document.getElementById('current-nickname').textContent = nickname;
+  
+  // 外部連携設定を読み込み
+  await loadExternalSettings(user);
 
   // ニックネーム変更フォーム
   const nicknameForm = document.getElementById('nickname-form');
@@ -108,3 +111,98 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+// 外部連携設定を読み込み
+async function loadExternalSettings(user) {
+  const { data: settings } = await supabaseClient
+    .from('user_settings')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+  
+  // LINE連携状況
+  const lineStatus = document.getElementById('line-status');
+  const lineConnectBtn = document.getElementById('line-connect-btn');
+  const lineDisconnectBtn = document.getElementById('line-disconnect-btn');
+  
+  if (settings && settings.line_notify_enabled) {
+    lineStatus.textContent = '状態: 連携済み';
+    lineStatus.style.color = '#4caf50';
+    lineDisconnectBtn.style.display = 'inline-block';
+  } else {
+    lineStatus.textContent = '状態: 未連携';
+    lineStatus.style.color = '#999';
+    lineConnectBtn.style.display = 'inline-block';
+  }
+  
+  // LINE連携ボタン
+  lineConnectBtn.addEventListener('click', async () => {
+    alert('LINE連携機能は現在開発中です。');
+    // TODO: LINE NotifyのOAuthフローを実装
+  });
+  
+  // LINE連携解除ボタン
+  lineDisconnectBtn.addEventListener('click', async () => {
+    if (!confirm('LINE連携を解除しますか？')) return;
+    
+    const { error } = await supabaseClient
+      .from('user_settings')
+      .update({ 
+        line_notify_enabled: false,
+        line_notify_token: null 
+      })
+      .eq('user_id', user.id);
+    
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    
+    alert('LINE連携を解除しました。');
+    location.reload();
+  });
+  
+  // Gemini設定
+  if (settings) {
+    document.getElementById('gemini-api-key').value = settings.gemini_api_key || '';
+    document.getElementById('gemini-enabled').checked = settings.gemini_enabled || false;
+  }
+  
+  // Gemini設定フォーム
+  document.getElementById('gemini-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const apiKey = document.getElementById('gemini-api-key').value.trim();
+    const enabled = document.getElementById('gemini-enabled').checked;
+    
+    const updateData = {
+      gemini_api_key: apiKey || null,
+      gemini_enabled: enabled
+    };
+    
+    if (settings) {
+      // 更新
+      const { error } = await supabaseClient
+        .from('user_settings')
+        .update(updateData)
+        .eq('user_id', user.id);
+      
+      if (error) {
+        alert(error.message);
+        return;
+      }
+    } else {
+      // 新規作成
+      const { error } = await supabaseClient
+        .from('user_settings')
+        .insert({ ...updateData, user_id: user.id });
+      
+      if (error) {
+        alert(error.message);
+        return;
+      }
+    }
+    
+    alert('Gemini設定を保存しました。');
+  });
+}

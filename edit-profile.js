@@ -32,12 +32,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (cropper) {
           cropper.destroy();
         }
-        cropper = new Cropper(photoPreview, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-          responsive: true
-        });
+        // スマホ対応: コンテナのサイズを明示的に設定
+        photoPreviewContainer.style.maxWidth = '100%';
+        photoPreviewContainer.style.height = 'auto';
+        photoPreview.style.maxWidth = '100%';
+        photoPreview.style.display = 'block';
+        
+        // 画像読み込み後にCropperを初期化
+        photoPreview.onload = () => {
+          cropper = new Cropper(photoPreview, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 1,
+            responsive: true,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false
+          });
+        };
         croppedBlob = null;
       };
       reader.readAsDataURL(file);

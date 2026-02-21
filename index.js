@@ -11,6 +11,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   // ログインしていない場合はログインページへリダイレクトします
   const user = await ensureLoggedIn();
   if (!user) return;
+  
+  // LINE連携状況を確認
+  await checkLineConnection(user);
+  
+  // AIアドバイスを読み込み
+  await loadAIAdvice(user);
+  
   await loadStatsAndPending();
   
   // タブ切替
@@ -29,6 +36,41 @@ window.addEventListener('DOMContentLoaded', async () => {
     drawChart();
   });
 });
+
+// LINE連携状況を確認
+async function checkLineConnection(user) {
+  const { data: settings } = await supabaseClient
+    .from('user_settings')
+    .select('line_notify_enabled')
+    .eq('user_id', user.id)
+    .single();
+  
+  // LINE連携していない場合はアナウンスを表示
+  if (!settings || !settings.line_notify_enabled) {
+    document.getElementById('line-notice').style.display = 'block';
+  }
+}
+
+// AIアドバイスを読み込み
+async function loadAIAdvice(user) {
+  const adviceEl = document.getElementById('advice-content');
+  
+  // Gemini APIが設定されているか確認
+  const { data: settings } = await supabaseClient
+    .from('user_settings')
+    .select('gemini_enabled, gemini_api_key')
+    .eq('user_id', user.id)
+    .single();
+  
+  if (!settings || !settings.gemini_enabled || !settings.gemini_api_key) {
+    adviceEl.textContent = 'AIアドバイス機能を使用するには、アカウント設定でGemini APIを設定してください。';
+    return;
+  }
+  
+  // TODO: Gemini APIを呼び出してアドバイスを取得
+  // 現時点ではプレースホルダーメッセージを表示
+  adviceEl.textContent = '今日も素敵な出会いがありますように！プロフィールを更新して、気持ちを整理しましょう。';
+}
 
 // 日付を "M/D(曜日)" 形式にフォーマット
 function formatDateJP(dateStr) {

@@ -65,7 +65,29 @@
       </section>
       <section>
         <h2>外部連携設定</h2>
-        <p style="color:#999; font-size:0.9rem;">AIアドバイス機能は管理者が設定します。</p>
+        
+        <!-- LINE連携 -->
+        <div style="margin-bottom:2rem;">
+          <h3>LINE通知</h3>
+          <p id="line-status">状態: 確認中...</p>
+          <button id="line-connect-btn" style="display:none;">ＬＩＮＥと連携する</button>
+          <button id="line-disconnect-btn" style="display:none; background-color:#e57373;">ＬＩＮＥ連携を解除</button>
+        </div>
+        
+        <!-- Gemini API設定 -->
+        <div>
+          <h3>AIアドバイス機能</h3>
+          <form id="gemini-form">
+            <label>Gemini APIキー:
+              <input type="text" id="gemini-api-key" placeholder="APIキーを入力">
+            </label>
+            <label style="display:flex; align-items:center; gap:0.5rem;">
+              <input type="checkbox" id="gemini-enabled" style="width:auto;">
+              AIアドバイス機能を有効化
+            </label>
+            <button type="submit">保存</button>
+          </form>
+        </div>
       </section>
     </main>
     <!-- 右下に固定表示するログアウトボタン -->
