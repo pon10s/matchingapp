@@ -8,9 +8,12 @@ let currentPeriod = '3months';
 let currentChartType = 'status';
 
 window.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOMContentLoaded fired');
   // ログインしていない場合はログインページへリダイレクトします
   const user = await ensureLoggedIn();
   if (!user) return;
+  
+  console.log('User logged in:', user.id);
   
   // LINE連携状況を確認
   await checkLineConnection(user);
@@ -18,7 +21,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   // AIアドバイスを読み込み
   await loadAIAdvice(user);
   
+  // 統計情報と未更新イベントを読み込み
   await loadStatsAndPending();
+  
+  console.log('Stats loaded');
   
   // タブ切替
   const chartTabs = document.querySelectorAll('.chart-tab');
@@ -177,41 +183,51 @@ function formatDateJP(dateStr) {
 
 // 統計情報と未更新イベントリストを読み込み表示する
 async function loadStatsAndPending() {
+  console.log('loadStatsAndPending called');
   const user = await ensureLoggedIn();
   if (!user) return;
   const today = new Date().toISOString().slice(0, 10);
+  console.log('Today:', today);
   // プロフィールとイベントを取得
   const { data: profiles, error: profError } = await supabaseClient
     .from('profiles')
     .select('id, name, status, summary, app')
     .eq('user_id', user.id);
   if (profError) {
-    console.error(profError);
+    console.error('Profile error:', profError);
     return;
   }
+  console.log('Profiles:', profiles);
   const { data: events, error: evError } = await supabaseClient
     .from('events')
     .select('id, profile_id, event_date, comment')
     .eq('user_id', user.id);
   if (evError) {
-    console.error(evError);
+    console.error('Events error:', evError);
     return;
   }
+  console.log('Events:', events);
   
   allProfiles = profiles || [];
   allEvents = events || [];
   
+  console.log('allProfiles:', allProfiles.length);
+  console.log('allEvents:', allEvents.length);
+  
   // プロフィール数
   const profilesCount = allProfiles.length;
   document.getElementById('profiles-count').textContent = profilesCount;
+  console.log('Set profiles-count to:', profilesCount);
   // 本日以降の予定数
   const upcomingCount = allEvents.filter(ev => ev.event_date >= today).length;
   document.getElementById('upcoming-count').textContent = upcomingCount;
+  console.log('Set upcoming-count to:', upcomingCount);
   // 未更新イベント（過去の日付かつ comment が空）
   const pendingEvents = allEvents.filter(ev => {
     return ev.event_date < today && (!ev.comment || ev.comment.trim() === '');
   });
   document.getElementById('pending-count').textContent = pendingEvents.length;
+  console.log('Set pending-count to:', pendingEvents.length);
   renderPendingList(pendingEvents, allProfiles);
   
   // グラフ描画
@@ -301,11 +317,17 @@ async function renderPendingList(pendingEvents, profiles) {
 
 // グラフ描画
 function drawChart() {
+  console.log('drawChart called, type:', currentChartType);
   if (currentChart) {
     currentChart.destroy();
   }
   
-  const ctx = document.getElementById('statsChart').getContext('2d');
+  const canvas = document.getElementById('statsChart');
+  if (!canvas) {
+    console.error('Canvas not found');
+    return;
+  }
+  const ctx = canvas.getContext('2d');
   
   if (currentChartType === 'status') {
     drawStatusChart(ctx);
@@ -318,16 +340,24 @@ function drawChart() {
 
 // ステータス別人数グラフ
 function drawStatusChart(ctx) {
+  console.log('drawStatusChart called');
   const statusCount = {};
   allProfiles.forEach(p => {
     const status = p.status || 'わからない';
     statusCount[status] = (statusCount[status] || 0) + 1;
   });
   
+  console.log('statusCount:', statusCount);
+  
   const labels = Object.keys(statusCount);
   const data = Object.values(statusCount);
   
-  if (labels.length === 0) return;
+  if (labels.length === 0) {
+    console.log('No data for status chart');
+    return;
+  }
+  
+  console.log('Creating chart with labels:', labels, 'data:', data);
   
   currentChart = new Chart(ctx, {
     type: 'pie',
