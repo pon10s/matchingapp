@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderProfileDetail(profile) {
   const detailSection = document.getElementById('detail-section');
   detailSection.innerHTML = '';
+  
+  // 名前をh2で表示
+  const h2 = document.createElement('h2');
+  h2.textContent = profile.name;
+  detailSection.appendChild(h2);
+  
   // 写真
   if (profile.photo_url) {
     const img = document.createElement('img');
@@ -39,6 +45,9 @@ function renderProfileDetail(profile) {
     img.style.maxWidth = '100%';
     img.style.borderRadius = '8px';
     img.style.marginBottom = '1rem';
+    img.style.display = 'block';
+    img.style.marginLeft = 'auto';
+    img.style.marginRight = 'auto';
     detailSection.appendChild(img);
   }
   // 詳細情報をテーブルとして表示
@@ -58,7 +67,13 @@ function renderProfileDetail(profile) {
   pushRow('年齢', profile.age);
   pushRow('身長', profile.height);
   pushRow('学歴', profile.education);
-  pushRow('年収', profile.income);
+  // 年収の表示を修正（開始にも万をつける）
+  let incomeDisplay = profile.income;
+  if (incomeDisplay && incomeDisplay.includes('〜') && !incomeDisplay.startsWith('〜')) {
+    // "300〜500万" → "300万〜500万"
+    incomeDisplay = incomeDisplay.replace(/^(\d+)〜/, '$1万〜');
+  }
+  pushRow('年収', incomeDisplay);
   pushRow('職業', profile.occupation);
   pushRow('住み', profile.residence);
   pushRow('ステータス', profile.status);

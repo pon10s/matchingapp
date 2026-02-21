@@ -35,9 +35,10 @@ function formatDateJP(dateStr) {
   return `${m}/${d}(${w})`;
 }
 
-// 回数を日本語表記に変換 (1: 1回目, 2: 2回目...)
+// 回数を日本語表記に変換 (1: 初回, 2: 2回目...)
 function formatCountJp(count) {
   if (!count) return '';
+  if (count === 1) return '初回';
   return `${count}回目`;
 }
 
@@ -128,7 +129,8 @@ function renderCalendar(eventsByDate) {
         window.location.href = `edit-event.html?id=${ev.id}`;
       });
       const dateTd = document.createElement('td');
-      dateTd.textContent = index === 0 ? formattedDate : '';
+      // 全ての行に日付を表示
+      dateTd.textContent = formattedDate;
       tr.appendChild(dateTd);
       const detailTd = document.createElement('td');
       const itemDiv = document.createElement('div');

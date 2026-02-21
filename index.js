@@ -58,7 +58,7 @@ async function loadAIAdvice(user) {
   const adviceEl = document.getElementById('advice-content');
   
   // 運営者のAPIキーを使用
-  if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+  if (!CONFIG || !CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
     adviceEl.textContent = 'AIアドバイス機能は現在設定中です。';
     return;
   }
@@ -203,15 +203,15 @@ async function loadStatsAndPending() {
   
   // プロフィール数
   const profilesCount = allProfiles.length;
-  document.getElementById('profiles-count').textContent = `${profilesCount}人`;
+  document.getElementById('profiles-count').textContent = profilesCount;
   // 本日以降の予定数
   const upcomingCount = allEvents.filter(ev => ev.event_date >= today).length;
-  document.getElementById('upcoming-count').textContent = `${upcomingCount}件`;
+  document.getElementById('upcoming-count').textContent = upcomingCount;
   // 未更新イベント（過去の日付かつ comment が空）
   const pendingEvents = allEvents.filter(ev => {
     return ev.event_date < today && (!ev.comment || ev.comment.trim() === '');
   });
-  document.getElementById('pending-count').textContent = `${pendingEvents.length}件`;
+  document.getElementById('pending-count').textContent = pendingEvents.length;
   renderPendingList(pendingEvents, allProfiles);
   
   // グラフ描画

@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       reader.onload = (e) => {
         photoPreview.src = e.target.result;
         photoPreviewContainer.style.display = 'block';
+        // Cropper初期化前にクラスをクリア
+        photoPreview.classList.remove('cropper-hidden');
+        photoPreview.style.display = 'block';
+        photoPreview.style.visibility = 'visible';
         // Cropper初期化
         if (cropper) {
           cropper.destroy();

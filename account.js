@@ -164,10 +164,10 @@ async function loadExternalSettings(user) {
     }
     
     // LINE友だち追加URLに遷移（「連携」というテキストを自動入力）
-    const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携`;
+    const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携します。このまま送信してください。`;
     window.open(lineUrl, '_blank');
     
-    alert(`連携手順：\n\n1. LINEアプリが開きます\n2. 「連携」というメッセージが入力されています\n3. 送信ボタンを押すだけ！\n4. 連携完了メッセージを確認\n5. このページをリロード`);
+    alert(`連携手順：\n\n1. LINEアプリが開きます\n2. 「連携します。このまま送信してください。」というメッセージが入力されています\n3. 送信ボタンを押すだけ！\n4. 連携完了メッセージを確認\n5. このページをリロード`);
   });
   
   // LINE連携解除ボタン
@@ -197,47 +197,5 @@ async function loadExternalSettings(user) {
     location.reload();
   });
   
-  // Gemini設定
-  if (settings) {
-    document.getElementById('gemini-api-key').value = settings.gemini_api_key || '';
-    document.getElementById('gemini-enabled').checked = settings.gemini_enabled || false;
-  }
-  
-  // Gemini設定フォーム
-  document.getElementById('gemini-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const apiKey = document.getElementById('gemini-api-key').value.trim();
-    const enabled = document.getElementById('gemini-enabled').checked;
-    
-    const updateData = {
-      gemini_api_key: apiKey || null,
-      gemini_enabled: enabled
-    };
-    
-    if (settings) {
-      // 更新
-      const { error } = await supabaseClient
-        .from('user_settings')
-        .update(updateData)
-        .eq('user_id', user.id);
-      
-      if (error) {
-        alert(error.message);
-        return;
-      }
-    } else {
-      // 新規作成
-      const { error } = await supabaseClient
-        .from('user_settings')
-        .insert({ ...updateData, user_id: user.id });
-      
-      if (error) {
-        alert(error.message);
-        return;
-      }
-    }
-    
-    alert('Gemini設定を保存しました。');
-  });
+  // Gemini設定は削除（運営者側で設定するため）
 }

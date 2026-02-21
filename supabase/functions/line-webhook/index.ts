@@ -33,22 +33,28 @@ serve(async (req) => {
         console.log('Code data:', codeData, 'Error:', codeError)
         
         if (codeData) {
+          console.log('[FOLLOW] Code found for user_id:', codeData.user_id)
+          
           // 既存の連携を解除（同じLINE IDの古い連携）
-          await supabase
+          const { data: oldData, error: deleteError } = await supabase
             .from('user_settings')
             .update({ line_user_id: null, line_notify_enabled: false })
             .eq('line_user_id', lineUserId)
+            .select()
           
-          // 連携を完了
-          const { error: updateError } = await supabase
+          console.log('[FOLLOW] Old connection removed:', oldData, 'Error:', deleteError)
+          
+          // 連携を完了（upsert使用）
+          const { data: upsertData, error: updateError } = await supabase
             .from('user_settings')
-            .update({
+            .upsert({
+              user_id: codeData.user_id,
               line_user_id: lineUserId,
               line_notify_enabled: true
-            })
-            .eq('user_id', codeData.user_id)
+            }, { onConflict: 'user_id' })
+            .select()
           
-          console.log('Update error:', updateError)
+          console.log('[FOLLOW] Upsert result:', upsertData, 'Error:', updateError)
           
           await supabase
             .from('line_connection_codes')
@@ -92,20 +98,28 @@ serve(async (req) => {
             .single()
           
           if (codeData) {
+            console.log('[MESSAGE] Code found for user_id:', codeData.user_id)
+            
             // 既存の連携を解除
-            await supabase
+            const { data: oldData, error: deleteError } = await supabase
               .from('user_settings')
               .update({ line_user_id: null, line_notify_enabled: false })
               .eq('line_user_id', lineUserId)
+              .select()
             
-            // 連携を完了
-            const { error: updateError } = await supabase
+            console.log('[MESSAGE] Old connection removed:', oldData, 'Error:', deleteError)
+            
+            // 連携を完了（upsert使用）
+            const { data: upsertData, error: updateError } = await supabase
               .from('user_settings')
-              .update({
+              .upsert({
+                user_id: codeData.user_id,
                 line_user_id: lineUserId,
                 line_notify_enabled: true
-              })
-              .eq('user_id', codeData.user_id)
+              }, { onConflict: 'user_id' })
+              .select()
+            
+            console.log('[MESSAGE] Upsert result:', upsertData, 'Error:', updateError)
             
             await supabase
               .from('line_connection_codes')
