@@ -1,8 +1,19 @@
 // ログインおよび新規登録ページの挙動を制御します。
 document.addEventListener('DOMContentLoaded', async () => {
-  // パスワード再設定リンクからのアクセスを検知
+  // パスワード再設定リンクからのアクセスを検知（最優先）
   const hash = window.location.hash;
-  if (hash && hash.includes('type=recovery')) {
+  const isRecovery = hash && hash.includes('type=recovery');
+  
+  // 通常のログイン画面：既にログイン済みかつ再設定でない場合はホームへ
+  if (!isRecovery) {
+    const { data } = await supabaseClient.auth.getUser();
+    if (data && data.user) {
+      window.location.href = 'index.html';
+      return;
+    }
+  }
+  
+  if (isRecovery) {
     // パスワード再設定セクションを表示
     document.getElementById('auth-choice').style.display = 'none';
     document.getElementById('login-section').style.display = 'none';
