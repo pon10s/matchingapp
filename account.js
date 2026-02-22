@@ -139,17 +139,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         .select();
       console.log('line_connection_codes削除:', lineData, lineErr);
       
-      // ログアウト（ユーザー削除前に実行）
-      await supabaseClient.auth.signOut();
-      
-      // ユーザーアカウントを削除
+      // ユーザーアカウントを削除（ログアウト前に実行）
       const { error: deleteUserErr } = await supabaseClient.rpc('delete_user');
       console.log('delete_user実行:', deleteUserErr);
       if (deleteUserErr) {
         console.error('アカウント削除エラー:', deleteUserErr);
+        alert('アカウント削除に失敗しました: ' + deleteUserErr.message);
+        return;
       }
-      alert('アカウントデータを削除しました。ご利用ありがとうございました。');
+      
+      // ログアウト（削除後はエラーになるが無視）
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {
+        console.log('signOutエラー（無視）:', e);
+      }
+      
+      // リダイレクトを先に実行
       window.location.href = 'login.html';
+      
+      // アラートはリダイレクト後に表示（実際には表示されない）
+      alert('アカウントデータを削除しました。ご利用ありがとうございました。');
     } catch (err) {
       console.error('削除エラー:', err);
       alert(err.message);
