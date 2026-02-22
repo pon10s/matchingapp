@@ -68,7 +68,7 @@ CREATE EXTENSION IF NOT EXISTS pg_cron;
 ```
 
 ### 3.2 Cronジョブの作成
-SQL Editorで実行（YOUR_PROJECT_IDとYOUR_ANON_KEYを置き換え）:
+SQL Editorで以下を実行:
 
 ```sql
 SELECT cron.schedule(
@@ -77,16 +77,12 @@ SELECT cron.schedule(
   $$
   SELECT
     net.http_post(
-      url:='https://YOUR_PROJECT_ID.supabase.co/functions/v1/send-daily-notifications',
-      headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb
+      url:='https://wpagpmjjgwsnowvnhmml.supabase.co/functions/v1/send-daily-notifications',
+      headers:='{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwYWdwbWpqZ3dzbm93dm5obW1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3MjI5NzcsImV4cCI6MjA1MTI5ODk3N30.sb_publishable_-e8W4jFQ-TB9KraQBA_OTw_moXmZGEz"}'::jsonb
     ) as request_id;
   $$
 );
 ```
-
-**プロジェクトIDとANON KEYの確認方法:**
-- Settings → API → Project URL（プロジェクトID部分）
-- Settings → API → anon public
 
 ---
 
@@ -121,8 +117,8 @@ Edge Functions画面で「Invoke」ボタンをクリック、またはcurlで�
 
 ```bash
 curl -X POST \
-  https://YOUR_PROJECT_ID.supabase.co/functions/v1/send-daily-notifications \
-  -H "Authorization: Bearer YOUR_ANON_KEY" \
+  https://wpagpmjjgwsnowvnhmml.supabase.co/functions/v1/send-daily-notifications \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwYWdwbWpqZ3dzbm93dm5obW1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3MjI5NzcsImV4cCI6MjA1MTI5ODk3N30.sb_publishable_-e8W4jFQ-TB9KraQBA_OTw_moXmZGEz" \
   -H "Content-Type: application/json"
 ```
 
