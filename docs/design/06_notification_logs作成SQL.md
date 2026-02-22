@@ -15,9 +15,11 @@ CREATE INDEX IF NOT EXISTS idx_notification_logs_type ON notification_logs(notif
 -- RLS設定
 ALTER TABLE notification_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own logs" ON notification_logs;
 CREATE POLICY "Users can view own logs" ON notification_logs
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role can manage all logs" ON notification_logs;
 CREATE POLICY "Service role can manage all logs" ON notification_logs
   FOR ALL 
   TO service_role
