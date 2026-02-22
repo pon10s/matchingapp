@@ -1,5 +1,38 @@
 // ログインおよび新規登録ページの挙動を制御します。
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // パスワード再設定リンクからのアクセスを検知
+  const hash = window.location.hash;
+  if (hash && hash.includes('type=recovery')) {
+    // パスワード再設定セクションを表示
+    document.getElementById('auth-choice').style.display = 'none';
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('register-section').style.display = 'none';
+    document.getElementById('reset-password-section').style.display = 'block';
+    
+    // パスワード再設定フォーム
+    const resetPasswordForm = document.getElementById('reset-password-form');
+    resetPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById('new-password-reset').value;
+      const confirmPassword = document.getElementById('new-password-reset-confirm').value;
+      
+      if (newPassword !== confirmPassword) {
+        alert('パスワードが一致しません');
+        return;
+      }
+      
+      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      
+      alert('パスワードを変更しました。ログインしてください。');
+      window.location.href = 'login.html';
+    });
+    return;
+  }
+  
   // セクション要素を取得
   const choiceSection = document.getElementById('auth-choice');
   const loginSection = document.getElementById('login-section');
