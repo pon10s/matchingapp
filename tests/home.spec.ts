@@ -47,11 +47,13 @@ test.describe('ホーム画面', () => {
 
   test('HOME-003: 登録相手数の表示', async ({ page }) => {
     await page.goto('/index.html');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
     
     // 登録相手数が表示されることを確認
     const profilesCount = page.locator('#profiles-count');
     await expect(profilesCount).toBeVisible();
-    await expect(profilesCount).toContainText('人');
+    await expect(profilesCount).toContainText('3');
   });
 
   test('HOME-006: LINE未連携時のアナウンス表示', async ({ page }) => {

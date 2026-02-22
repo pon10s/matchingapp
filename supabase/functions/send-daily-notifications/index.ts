@@ -51,7 +51,7 @@ serve(async (req) => {
         for (const event of upcomingEvents) {
           notifications.push({
             type: 'upcoming_date',
-            message: `📅 明日は${event.profiles.name}さんとのデートです！楽しんできてください✨`,
+            message: `📅 明日は${event.profiles.name}さんとのデートです！楽しんできてください✨\n\nhttps://pon10s.github.io/matchingapp/`,
             profile_id: event.profile_id
           })
         }
@@ -69,7 +69,7 @@ serve(async (req) => {
         for (const event of pendingEvents) {
           notifications.push({
             type: 'pending_comment',
-            message: `📝 ${event.profiles.name}さんとのデートの感想を記録しましょう！`,
+            message: `📝 ${event.profiles.name}さんとのデートの感想を記録しましょう！\n\nhttps://pon10s.github.io/matchingapp/`,
             profile_id: event.profile_id
           })
         }
@@ -85,11 +85,28 @@ serve(async (req) => {
 
       if (profiles && profiles.length > 0) {
         for (const profile of profiles) {
-          notifications.push({
-            type: 'status_change_reminder',
-            message: `💭 ${profile.name}さんのステータスを見直してみませんか？`,
-            profile_id: profile.id
-          })
+          // 最後に通知した日時を確認
+          const { data: lastNotification } = await supabaseClient
+            .from('notification_logs')
+            .select('created_at')
+            .eq('user_id', user.user_id)
+            .eq('profile_id', profile.id)
+            .eq('notification_type', 'status_change_reminder')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+
+          // 最後の通知から15日以上経過しているか、または初回通知の場合のみ送信
+          const shouldNotify = !lastNotification || 
+            new Date(lastNotification.created_at) < new Date(Date.now() - 15 * 86400000)
+
+          if (shouldNotify) {
+            notifications.push({
+              type: 'status_change_reminder',
+              message: `💭 ${profile.name}さんのステータスを見直してみませんか？\n\nhttps://pon10s.github.io/matchingapp/`,
+              profile_id: profile.id
+            })
+          }
         }
       }
 

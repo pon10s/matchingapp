@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 
 test.describe('プロフィール一覧', () => {
   test.beforeEach(async ({ page, context }) => {
-    // LocalStorageをクリア
     await context.clearCookies();
     await page.goto('http://localhost:5500/login.html');
     await page.evaluate(() => localStorage.clear());
@@ -12,6 +11,23 @@ test.describe('プロフィール一覧', () => {
     await page.fill('#login-password', 'testpassword');
     await page.click('button[type="submit"]');
     await page.waitForURL('**/index.html');
+    
+    // テスト用データのみ残す
+    await page.evaluate(async () => {
+      const { data: user } = await window.supabaseClient.auth.getUser();
+      const { data: profiles } = await window.supabaseClient
+        .from('profiles')
+        .select('id, name')
+        .eq('user_id', user.user.id);
+      
+      const testNames = ['山田花子', '佐藤美咲', '鈴木愛'];
+      const toDelete = profiles.filter(p => !testNames.includes(p.name)).map(p => p.id);
+      
+      if (toDelete.length > 0) {
+        await window.supabaseClient.from('profiles').delete().in('id', toDelete);
+      }
+    });
+    
     await page.goto('http://localhost:5500/profiles.html');
     await page.waitForLoadState('networkidle');
   });

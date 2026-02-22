@@ -75,6 +75,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (cropper) {
       cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob((blob) => {
         croppedBlob = blob;
+        // Cropperを破棄してプレビューを非表示
+        cropper.destroy();
+        cropper = null;
+        photoPreviewContainer.style.display = 'none';
         alert('トリミング完了！保存してください。');
       }, 'image/jpeg', 0.9);
     }

@@ -9,6 +9,10 @@
     "test:debug": "playwright test --debug"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0"
+    "@playwright/test": "^1.40.0",
+    "supabase": "^2.76.12"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0"
   }
 }

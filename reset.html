@@ -36,7 +36,7 @@
         if (!email) return;
         // GitHub Pages のURLに合わせてリダイレクト先を設定
         // 実運用時にはこの値を環境に合わせて調整してください
-        const redirectTo = window.location.origin + '/';
+        const redirectTo = 'https://pon10s.github.io/matchingapp/';
         const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
         if (error) {
           alert(error.message);

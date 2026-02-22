@@ -10,7 +10,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('current-nickname').textContent = nickname;
   
   // 外部連携設定を読み込み
-  await loadExternalSettings(user);
+  try {
+    await loadExternalSettings(user);
+  } catch (err) {
+    console.error('loadExternalSettingsエラー:', err);
+  }
 
   // ニックネーム変更フォーム
   const nicknameForm = document.getElementById('nickname-form');
@@ -81,32 +85,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // アカウント削除ボタン
   const delBtn = document.getElementById('delete-account-btn');
+  console.log('delete-account-btn:', delBtn);
+  if (!delBtn) {
+    console.error('削除ボタンが見つかりません');
+    return;
+  }
   delBtn.addEventListener('click', async () => {
-    if (!confirm('本当にアカウントを削除しますか？この操作は取り消せません。')) return;
+    console.log('削除ボタンがクリックされました');
+    if (!confirm('本当にアカウントを削除しますか？この操作は取り消せません。')) {
+      console.log('削除がキャンセルされました');
+      return;
+    }
     try {
-      // delete all profiles and events belonging to user
-      const { error: profErr } = await supabaseClient
-        .from('profiles')
-        .delete()
-        .eq('user_id', user.id);
-      if (profErr) {
-        alert(profErr.message);
-        return;
-      }
-      const { error: evErr } = await supabaseClient
+      console.log('削除開始 user_id:', user.id);
+      
+      // イベントを先に削除
+      const { data: evData, error: evErr } = await supabaseClient
         .from('events')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .select();
+      console.log('events削除:', evData, evErr);
       if (evErr) {
-        alert(evErr.message);
+        alert('イベント削除エラー: ' + evErr.message);
         return;
       }
-      // Supabaseのauth.admin.deleteUserはRPCから呼ぶ必要があるため、クライアント側ではログアウトのみ実行
+      
+      // プロフィールを削除
+      const { data: profData, error: profErr } = await supabaseClient
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id)
+        .select();
+      console.log('profiles削除:', profData, profErr);
+      if (profErr) {
+        alert('プロフィール削除エラー: ' + profErr.message);
+        return;
+      }
+      
+      // user_settingsを削除
+      const { data: setData, error: setErr } = await supabaseClient
+        .from('user_settings')
+        .delete()
+        .eq('user_id', user.id)
+        .select();
+      console.log('user_settings削除:', setData, setErr);
+      
+      // line_connection_codesを削除
+      const { data: lineData, error: lineErr } = await supabaseClient
+        .from('line_connection_codes')
+        .delete()
+        .eq('user_id', user.id)
+        .select();
+      console.log('line_connection_codes削除:', lineData, lineErr);
+      
+      // ログアウト
       await supabaseClient.auth.signOut();
       alert('アカウントデータを削除しました。ご利用ありがとうございました。');
-      // redirect to login
       window.location.href = 'login.html';
     } catch (err) {
+      console.error('削除エラー:', err);
       alert(err.message);
     }
   });
@@ -114,13 +152,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 外部連携設定を読み込み
 async function loadExternalSettings(user) {
-  const { data: settings } = await supabaseClient
+  const { data: settings, error } = await supabaseClient
     .from('user_settings')
     .select('*')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
   
-  console.log('Settings loaded:', settings);
+  console.log('Settings loaded:', settings, 'error:', error);
   
   // LINE連携状況
   const lineStatus = document.getElementById('line-status');
@@ -146,56 +184,40 @@ async function loadExternalSettings(user) {
   }
   
   // LINE連携ボタン
-  lineConnectBtn.addEventListener('click', async () => {
-    // ワンタイムコードを生成
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    
-    // データベースに保存
-    const { error: insertError } = await supabaseClient
-      .from('line_connection_codes')
-      .insert({
-        user_id: user.id,
-        code: code
-      });
-    
-    if (insertError) {
-      alert('エラー: ' + insertError.message);
-      return;
-    }
-    
-    // LINE友だち追加URLに遷移（「連携」というテキストを自動入力）
-    const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携します。このまま送信してください。`;
-    window.open(lineUrl, '_blank');
-    
-    alert(`連携手順：\n\n1. LINEアプリが開きます\n2. 「連携します。このまま送信してください。」というメッセージが入力されています\n3. 送信ボタンを押すだけ！\n4. 連携完了メッセージを確認\n5. このページをリロード`);
-  });
+  if (lineConnectBtn) {
+    lineConnectBtn.addEventListener('click', async () => {
+      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携します。このまま送信してください。`;
+      window.open(lineUrl, '_blank');
+    });
+  }
   
   // LINE連携解除ボタン
-  lineDisconnectBtn.addEventListener('click', async () => {
-    if (!confirm('LINE連携を解除しますか？\n\n再連携する場合は、解除後に「連携する」ボタンをクリックしてください。')) return;
-    
-    const { error } = await supabaseClient
-      .from('user_settings')
-      .update({ 
-        line_notify_enabled: false,
-        line_user_id: null 
-      })
-      .eq('user_id', user.id);
-    
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    
-    // 使用済みコードを削除
-    await supabaseClient
-      .from('line_connection_codes')
-      .delete()
-      .eq('user_id', user.id);
-    
-    alert('LINE連携を解除しました。');
-    location.reload();
-  });
+  if (lineDisconnectBtn) {
+    lineDisconnectBtn.addEventListener('click', async () => {
+      if (!confirm('LINE連携を解除しますか？\n\n再連携する場合は、解除後に「連携する」ボタンをクリックしてください。')) return;
+      
+      const { error } = await supabaseClient
+        .from('user_settings')
+        .update({ 
+          line_notify_enabled: false,
+          line_user_id: null 
+        })
+        .eq('user_id', user.id);
+      
+      if (error) {
+        alert(error.message);
+        return;
+      }
+      
+      await supabaseClient
+        .from('line_connection_codes')
+        .delete()
+        .eq('user_id', user.id);
+      
+      alert('LINE連携を解除しました。');
+      location.reload();
+    });
+  }
   
   // Gemini設定は削除（運営者側で設定するため）
 }

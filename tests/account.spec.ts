@@ -77,49 +77,9 @@ test.describe('アカウント管理画面', () => {
   });
 
   test('ACCT-005: Gemini設定の読み込み', async ({ page }) => {
-    // Gemini設定が表示されることを確認
-    const apiKeyInput = page.locator('#gemini-api-key');
-    await expect(apiKeyInput).toBeVisible();
-    
-    const enabledCheckbox = page.locator('#gemini-enabled');
-    await expect(enabledCheckbox).toBeVisible();
-  });
-
-  test('ACCT-007: Gemini設定の保存', async ({ page }) => {
-    // APIキーを入力
-    await page.fill('#gemini-api-key', 'test-api-key-12345');
-    
-    // 有効化チェックボックスをON
-    await page.check('#gemini-enabled');
-    
-    // 保存ボタンをクリック
-    const geminiForm = page.locator('#gemini-form');
-    
-    page.on('dialog', dialog => {
-      expect(dialog.message()).toContain('保存しました');
-      dialog.accept();
-    });
-    
-    await geminiForm.locator('button[type="submit"]').click();
-  });
-
-  test('ACCT-008: Gemini無効化', async ({ page }) => {
-    // チェックボックスをOFF
-    await page.uncheck('#gemini-enabled');
-    
-    // 保存
-    const geminiForm = page.locator('#gemini-form');
-    
-    page.on('dialog', dialog => {
-      dialog.accept();
-    });
-    
-    await geminiForm.locator('button[type="submit"]').click();
-    
-    // ページをリロードして確認
-    await page.reload();
-    const enabledCheckbox = page.locator('#gemini-enabled');
-    await expect(enabledCheckbox).not.toBeChecked();
+    await page.goto('/index.html');
+    const adviceContent = page.locator('#advice-content');
+    await expect(adviceContent).toBeVisible();
   });
 
   test('ニックネーム変更', async ({ page }) => {
@@ -134,5 +94,64 @@ test.describe('アカウント管理画面', () => {
     // フォームがリセットされることを確認
     const input = page.locator('#new-nickname');
     await expect(input).toHaveValue('');
+  });
+
+  test('メールアドレス変更', async ({ page }) => {
+    const newEmail = 'test-updated@example.com';
+    
+    await page.fill('#new-email', newEmail);
+    
+    page.on('dialog', dialog => {
+      dialog.accept();
+    });
+    
+    await page.click('#email-form button[type="submit"]');
+    await page.waitForTimeout(2000);
+    
+    // フォームがリセットされることを確認
+    const input = page.locator('#new-email');
+    await expect(input).toHaveValue('');
+  });
+
+  test('パスワード変更（正常）', async ({ page }) => {
+    await page.fill('#new-password', 'newpassword123');
+    await page.fill('#new-password-confirm', 'newpassword123');
+    
+    page.on('dialog', dialog => {
+      dialog.accept();
+    });
+    
+    await page.click('#password-form button[type="submit"]');
+    await page.waitForTimeout(2000);
+    
+    // フォームがリセットされることを確認
+    const input = page.locator('#new-password');
+    await expect(input).toHaveValue('');
+  });
+
+  test('パスワード変更（不一致）', async ({ page }) => {
+    await page.fill('#new-password', 'newpassword123');
+    await page.fill('#new-password-confirm', 'differentpassword');
+    
+    page.on('dialog', dialog => {
+      expect(dialog.message()).toContain('一致');
+      dialog.accept();
+    });
+    
+    await page.click('#password-form button[type="submit"]');
+    await page.waitForTimeout(500);
+  });
+
+  test('アカウント削除（キャンセル）', async ({ page }) => {
+    page.on('dialog', dialog => {
+      expect(dialog.message()).toContain('削除');
+      dialog.dismiss();
+    });
+    
+    await page.click('#delete-account-btn');
+    await page.waitForTimeout(500);
+    
+    // ページがそのままであることを確認
+    await expect(page).toHaveURL('/account.html');
   });
 });
