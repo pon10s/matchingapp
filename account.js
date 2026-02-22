@@ -139,6 +139,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         .select();
       console.log('line_connection_codes削除:', lineData, lineErr);
       
+      // ユーザーアカウントを削除
+      const { error: deleteUserErr } = await supabaseClient.rpc('delete_user');
+      console.log('delete_user実行:', deleteUserErr);
+      if (deleteUserErr) {
+        alert('アカウント削除エラー: ' + deleteUserErr.message);
+        return;
+      }
+      
       // ログアウト
       await supabaseClient.auth.signOut();
       alert('アカウントデータを削除しました。ご利用ありがとうございました。');
