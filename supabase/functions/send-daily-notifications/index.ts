@@ -6,6 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// LINE Messaging APIの設定（config.jsから）
+const LINE_CHANNEL_ACCESS_TOKEN = 'ZQTsgXJM26BSUqe/cBtorzwQEAJMu0Q5yZWUEYy7o/Ux7L1p0Orjc0J+/s2QipNuUdbxkHyNoKPyZUaF9bbkfggktUAgXhjy/PG06tHH794k0hEO25WZVGToza2HqSQ8OGlk+w0wKdIny1gjYNVdvwdB04t89/1O/w1cDnyilFU='
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -22,12 +25,12 @@ serve(async (req) => {
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
     const fifteenDaysAgo = new Date(Date.now() - 15 * 86400000).toISOString().split('T')[0]
 
-    // LINE通知が有効なユーザーを取得
+    // LINE通知が有効なユーザーを取得（line_user_idが設定されているユーザー）
     const { data: users, error: usersError } = await supabaseClient
       .from('user_settings')
-      .select('user_id, line_notify_token')
+      .select('user_id, line_user_id')
       .eq('line_notify_enabled', true)
-      .not('line_notify_token', 'is', null)
+      .not('line_user_id', 'is', null)
 
     if (usersError) throw usersError
 
@@ -90,16 +93,22 @@ serve(async (req) => {
         }
       }
 
-      // LINE通知送信
+      // LINE Messaging APIで通知送信
       for (const notif of notifications) {
         try {
-          const response = await fetch('https://notify-api.line.me/api/notify', {
+          const response = await fetch('https://api.line.me/v2/bot/message/push', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${user.line_notify_token}`,
-              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': `Bearer ${LINE_CHANNEL_ACCESS_TOKEN}`,
+              'Content-Type': 'application/json',
             },
-            body: `message=${encodeURIComponent(notif.message)}`,
+            body: JSON.stringify({
+              to: user.line_user_id,
+              messages: [{
+                type: 'text',
+                text: notif.message
+              }]
+            }),
           })
 
           if (response.ok) {
