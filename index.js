@@ -51,7 +51,7 @@ async function checkLineConnection(user) {
     .from('user_settings')
     .select('line_notify_enabled')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
   
   // LINE連携していない場合はアナウンスを表示
   if (!settings || !settings.line_notify_enabled) {
@@ -149,7 +149,7 @@ ${recentDatesInfo.map(d => `- ${d.name}さん (${d.date}): ${d.comment}`).join('
 
 上記の情報を踏まえて、マチアプネキとしてユーザーにアドバイスをください。`;
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
