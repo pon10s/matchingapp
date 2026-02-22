@@ -160,7 +160,12 @@ ${recentDatesInfo.map(d => `- ${d.name}さん (${d.date}): ${d.comment}`).join('
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gemini API error:', response.status, errorText);
-      throw new Error(`API呼び出しに失敗: ${response.status}`);
+      if (response.status === 429) {
+        adviceEl.textContent = 'APIの利用上限に達しました。しばらく待ってから再読み込みしてください。';
+      } else {
+        adviceEl.textContent = 'アドバイスの生成に失敗しました。';
+      }
+      return;
     }
     
     const data = await response.json();
