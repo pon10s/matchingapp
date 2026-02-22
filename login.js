@@ -33,6 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   
+  // 通常のログイン画面：既にログイン済みならホームへ
+  const { data } = await supabaseClient.auth.getUser();
+  if (data && data.user) {
+    window.location.href = 'index.html';
+    return;
+  }
+  
   // セクション要素を取得
   const choiceSection = document.getElementById('auth-choice');
   const loginSection = document.getElementById('login-section');
