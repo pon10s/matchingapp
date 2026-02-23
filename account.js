@@ -221,8 +221,8 @@ async function loadExternalSettings(user) {
         return;
       }
       
-      // ユーザーには「連携します」と表示し、裏でコードを送信
-      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携します。このまま送信してください。`;
+      // 新規登録は友達追加だけ、既存ユーザーは「連携」と送信
+      const lineUrl = `https://line.me/R/ti/p/@840izdny`;
       window.open(lineUrl, '_blank');
     });
   }
