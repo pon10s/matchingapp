@@ -567,6 +567,7 @@ select {
   background-color: #ffffff;
   color: var(--color-text-main);
   font-family: inherit;
+  height: 38px;
 }
 
 textarea {
@@ -575,8 +576,8 @@ textarea {
 }
 
 input[type="date"] {
-  width: 100%;
-  max-width: 100%;
+  width: 95%;
+  max-width: 95%;
 }
 
 input[type="radio"],

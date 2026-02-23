@@ -60,13 +60,18 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function checkLineConnection(user) {
   const { data: settings } = await supabaseClient
     .from('user_settings')
-    .select('line_notify_enabled')
+    .select('line_notify_enabled, line_user_id')
     .eq('user_id', user.id)
     .maybeSingle();
   
-  // LINE連携していない場合はアナウンスを表示
-  if (!settings || !settings.line_notify_enabled) {
-    document.getElementById('line-notice').style.display = 'block';
+  const banner = document.getElementById('line-banner');
+  
+  // LINE連携していない場合はバナーを表示
+  if (!settings || !settings.line_user_id) {
+    banner.style.display = 'block';
+    banner.onclick = () => {
+      window.open('https://line.me/R/ti/p/@840izdny', '_blank');
+    };
   }
 }
 
