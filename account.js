@@ -203,8 +203,28 @@ async function loadExternalSettings(user) {
   // LINE連携ボタン
   if (lineConnectBtn) {
     lineConnectBtn.addEventListener('click', async () => {
-      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携します。このまま送信してください。`;
+      // 連携コードを生成
+      const code = Math.random().toString(36).substring(2, 15);
+      
+      // line_connection_codesテーブルに保存
+      const { error } = await supabaseClient
+        .from('line_connection_codes')
+        .insert({
+          user_id: user.id,
+          code: code,
+          expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10分後
+        });
+      
+      if (error) {
+        console.error('Error creating connection code:', error);
+        alert('連携コードの生成に失敗しました');
+        return;
+      }
+      
+      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?${code}`;
       window.open(lineUrl, '_blank');
+      
+      alert('連携コードを生成しました。LINEでメッセージを送信してください。');
     });
   }
   
