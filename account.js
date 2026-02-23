@@ -221,8 +221,8 @@ async function loadExternalSettings(user) {
         return;
       }
       
-      // ユーザーにはコードを見せず、事前入力されたメッセージとして送信
-      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?${encodeURIComponent(code)}`;
+      // ユーザーには「連携します」と表示し、裏でコードを送信
+      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?連携します。このまま送信してください。`;
       window.open(lineUrl, '_blank');
     });
   }
