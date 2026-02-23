@@ -1,6 +1,6 @@
 {
-  "name": "マッチングアプリ管理",
-  "short_name": "マッチング管理",
+  "name": "Match Log",
+  "short_name": "Match Log",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fffaf5",
