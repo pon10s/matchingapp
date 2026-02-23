@@ -1,0 +1,239 @@
+/* ブルー系のパステルカラー */
+:root {
+  --bg-main: #f0f4f8;
+  --bg-card: #ffffff;
+  --primary: #a8c5e3;
+  --secondary: #c8ddf0;
+  --accent: #7ba3d1;
+  --text-main: #2c3e50;
+  --text-light: #6c7a89;
+  --border: #d4e2f0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body.modern-body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+  background: linear-gradient(135deg, #e8f1f8 0%, #f5f9fc 50%, #e8f1f8 100%);
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ヘッダー */
+.soft-header {
+  background: var(--bg-card);
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.soft-header h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ナビゲーション */
+.soft-nav {
+  display: flex;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.soft-nav-item {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.soft-nav-item.active {
+  color: var(--text-main);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* メイン */
+.soft-main {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 通知 */
+.soft-notice {
+  background: #fff9e6;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.soft-notice a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* カード */
+.soft-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-header h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.icon-small {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+
+/* アドバイス */
+.advice-section {
+  background: linear-gradient(135deg, #d4e8f7 0%, #e8f3fa 100%);
+}
+
+.advice-text {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+/* 統計行 */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+}
+
+.stat-info {
+  margin-top: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  margin-bottom: 0.25rem;
+}
+
+.stat-number {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* セレクト */
+.soft-select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.8rem;
+}
+
+/* タブ */
+.soft-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.soft-tab {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: var(--bg-main);
+  color: var(--text-light);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.soft-tab.active {
+  background: var(--primary);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* グラフ */
+.chart-wrapper {
+  position: relative;
+  height: 250px;
+}
+
+/* リスト */
+.soft-list {
+  list-style: none;
+}
+
+.soft-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.soft-list li:last-child {
+  border-bottom: none;
+}
+
+/* ログアウト */
+.soft-logout {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.soft-logout a {
+  display: block;
+  padding: 0.5rem 1rem;
+  background: var(--bg-card);
+  color: var(--text-light);
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* レスポンシブ */
+@media (min-width: 768px) {
+  .soft-main {
+    max-width: 800px;
+  }
+  
+  .stats-row {
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>アカウント管理 - Match Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Supabase client library and initialization -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <script src="config.js"></script>
+    <script src="lineHelper.js"></script>
+    <script defer src="account.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left">
+          <img src="icons/calendar_logo_colorful.svg" alt="logo" class="logo-icon">
+          <span class="app-title">Match L<span style="color:#D4869C;">o</span><span style="color:#7BA7D1;">g</span></span>
+        </div>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main style="padding:var(--spacing-lg);">
+        <section>
+          <h2>アカウント情報</h2>
+          <p><strong>メールアドレス:</strong> <span id="current-email">-</span></p>
+          <p><strong>ニックネーム:</strong> <span id="current-nickname">-</span></p>
+        </section>
+        <section>
+          <h2>ニックネームの変更</h2>
+          <form id="nickname-form">
+            <label>新しいニックネーム:
+              <input type="text" id="new-nickname" required>
+            </label>
+            <button type="submit">ニックネームを更新</button>
+          </form>
+        </section>
+        <section>
+          <h2>メールアドレスの変更</h2>
+          <form id="email-form">
+            <label>新しいメールアドレス:
+              <input type="email" id="new-email" required>
+            </label>
+            <button type="submit">メールアドレスを更新</button>
+          </form>
+        </section>
+        <section>
+          <h2>パスワードの変更</h2>
+          <form id="password-form">
+            <label>新しいパスワード:
+              <input type="password" id="new-password" required>
+            </label>
+            <label>パスワード（確認）:
+              <input type="password" id="new-password-confirm" required>
+            </label>
+            <button type="submit">パスワードを更新</button>
+          </form>
+        </section>
+        <section>
+          <h2>アカウントの削除</h2>
+          <p>アカウントを削除すると、すべてのプロフィールやデート情報が失われます。この操作は取り消せません。</p>
+          <button id="delete-account-btn" style="background-color:#e57373;color:#ffffff;">アカウントを削除</button>
+        </section>
+        <section>
+          <h2>外部連携設定</h2>
+          <div style="margin-bottom:2rem;">
+            <h3>LINE通知</h3>
+            <p id="line-status">状態: 確認中...</p>
+            <div id="line-not-connected" style="display:none;">
+              <button id="line-connect-btn" style="background-color:#06c755; color:white;">ＬＩＮＥと連携する</button>
+            </div>
+            <div id="line-connected" style="display:none;">
+              <button id="line-disconnect-btn" style="background-color:#e57373;">LINE連携を解除</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn">
+          <img src="icons/profiles.svg" alt="相手" class="nav-icon-img">
+          <span class="nav-label">相手</span>
+        </a>
+        <a href="events.html" class="nav-btn">
+          <img src="icons/plus.svg" alt="登録" class="nav-icon-img">
+          <span class="nav-label">登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="account.html" class="nav-btn active">
+          <img src="icons/settings.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
+  </body>
+</html>

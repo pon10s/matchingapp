@@ -3,18 +3,35 @@
   以前の配色は単調だったため、オレンジ、ブルー、ピンク、パープルなど複数の色味を取り入れました。
 */
 :root {
-  /* 新しいカラーパレット: 
-     アプリ全体をもっと柔らかく自然なトーンにするため、
-     パステルブルーとグレーを基調に、ピンク・サーモンオレンジをアクセントにしています。 */
-  /* 調和の取れた淡い色味に変更。空色からピンク、サーモンへ自然にグラデーションするイメージ。*/
-  /* 新しい淡いカラーパレット
-     パステルブルーとグレーを基調に、ほんのりピンクとベージュをアクセントにした柔らかなトーンです。*/
-  --primary: #a7cdf2;    /* パステルブルー */
-  --secondary: #dce4f7;  /* 薄いブルーグレー */
-  --tertiary: #f9dfe6;   /* ごく淡いピンク */
-  --accent: #f5e8d7;     /* ナチュラルベージュ */
-  --background: #f9fbff; /* ほぼ白に近い背景 */
-  --text: #344a62;       /* 深みのある青みがかったグレー */
+  /* Match Log デザイントークン（index/profiles基準） */
+  --color-primary: #a8c5e3;
+  --color-secondary: #d4b5d3;
+  --color-accent: #f5d5cb;
+  --color-text-main: #4a5568;
+  --color-text-light: #9ca3af;
+  --color-white: #ffffff;
+  --color-card-bg: rgba(255, 255, 255, 0.7);
+  
+  --radius-card: 24px;
+  --radius-pill: 999px;
+  --radius-medium: 16px;
+  
+  --shadow-soft: 0 10px 30px rgba(80, 110, 150, 0.12);
+  --shadow-card: 0 4px 16px rgba(100, 120, 160, 0.06);
+  
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  
+  /* 旧style.css互換用 */
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --tertiary: var(--color-accent);
+  --accent: var(--color-accent);
+  --background: #f9fbff;
+  --text: var(--color-text-main);
 }
 
 * {
@@ -22,20 +39,40 @@
 }
 
 body {
-  background-color: var(--background);
-  color: var(--text);
-  /* 日本語環境でも読みやすいフォントを指定 */
-  font-family: 'Segoe UI', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+  background: linear-gradient(135deg, 
+    #e8f1f8 0%, 
+    #f5e8f3 25%, 
+    #fef3ed 50%, 
+    #f5e8f3 75%, 
+    #e8f1f8 100%);
+  min-height: 100vh;
+  color: var(--color-text-main);
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
   margin: 0;
   padding: 0;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 header {
-  /* ヘッダーは淡いグラデーションで彩ります */
-  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
-  padding: 1rem;
-  text-align: center;
-  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(120, 150, 190, 0.18);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin: 0;
 }
 
 h1, h2 {
@@ -47,12 +84,14 @@ main {
 }
 
 section {
-  margin: 1rem 0;
-  padding: 1rem;
-  /* セクション背景も柔らかな色に変更 */
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-lg);
+  background: var(--color-card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 label {
@@ -96,17 +135,19 @@ label select {
 }
 
 button {
-  /* ボタンは輪郭線を無くし、自然なグラデーションを付ける */
-  background-image: linear-gradient(90deg, var(--primary), var(--accent));
-  color: #ffffff;
+  background: rgba(168, 197, 227, 0.2);
+  color: var(--color-text-main);
   border: none;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 button:hover {
-  /* ホバー時は透明度で反応を見せる */
-  opacity: 0.9;
+  background: rgba(168, 197, 227, 0.3);
 }
 
 table {
@@ -164,47 +205,12 @@ input[type="date"] {
    Flexレイアウトでタブをボタン風に整列し、すべてのリンクを常に表示します。
 --------------------------------------------- */
 .main-nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
-}
-.main-nav a {
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  border: none;
-  background-image: linear-gradient(90deg, var(--secondary), var(--tertiary));
-  color: var(--text);
-  transition: opacity 0.2s ease;
-  font-weight: bold;
-  white-space: nowrap;
-}
-.main-nav a:hover {
-  opacity: 0.85;
-  color: #ffffff;
-}
-.main-nav a.active {
-  background-image: linear-gradient(90deg, var(--primary), var(--accent));
-  color: #ffffff;
+  display: none;
 }
 
 /* 右下固定のログアウトボタン */
 .logout-bottom {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background-color: var(--secondary);
-  color: var(--text);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  border: none;
-  text-decoration: none;
-  z-index: 1000;
-}
-.logout-bottom:hover {
-  background-color: var(--accent);
+  display: none;
 }
 
 /* テーブルの操作ボタン列の整列 */
@@ -617,4 +623,389 @@ input[type="checkbox"] {
 select {
   box-shadow: none;
   border: 1px solid #d0d0d0;
+}
+
+
+/* ========================================
+   モダンデザイン - ホーム画面用
+======================================== */
+
+/* ヘッダー */
+.modern-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.5rem 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modern-header h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.logout-btn {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* ナビゲーション */
+.modern-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #666;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.nav-item:hover {
+  background: #f5f5f5;
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.nav-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.nav-label {
+  font-size: 0.75rem;
+}
+
+/* メインコンテンツ */
+.modern-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* 通知カード */
+.notice-card {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notice-icon {
+  font-size: 1.5rem;
+}
+
+.notice-card p {
+  margin: 0;
+  color: #2d3436;
+}
+
+.notice-card a {
+  color: #0984e3;
+  font-weight: bold;
+}
+
+/* AIアドバイスカード */
+.advice-card {
+  background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+}
+
+.advice-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.advice-icon {
+  font-size: 2rem;
+}
+
+.advice-card h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.advice-text {
+  color: white;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* 統計グリッド */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card-primary {
+  border-left: 4px solid #667eea;
+}
+
+.stat-card-success {
+  border-left: 4px solid #00b894;
+}
+
+.stat-card-warning {
+  border-left: 4px solid #fdcb6e;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  color: #999;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2d3436;
+}
+
+/* グラフカード */
+.chart-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chart-header h2 {
+  margin: 0;
+  color: #2d3436;
+  font-size: 1.2rem;
+}
+
+.period-select {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #2d3436;
+  width: auto;
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin-top: 1rem;
+}
+
+/* 更新待ちカード */
+.pending-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.pending-card h2 {
+  margin: 0 0 1rem 0;
+  color: #2d3436;
+  font-size: 1.2rem;
+}
+
+.pending-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pending-list li {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.pending-list li:last-child {
+  border-bottom: none;
+}
+
+/* フッター */
+.modern-footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  .modern-nav {
+    gap: 0.25rem;
+  }
+  
+  .nav-item {
+    padding: 0.5rem;
+  }
+  
+  .nav-icon {
+    font-size: 1.2rem;
+  }
+  
+  .nav-label {
+    font-size: 0.65rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .period-select {
+    width: 100%;
+  }
+}
+
+
+/* Match Log統一スタイル（index/profiles基準） */
+.app-container {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 430px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(120, 150, 190, 0.18);
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 -4px 20px rgba(80, 110, 150, 0.08);
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-light);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-medium);
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.nav-btn.active {
+  background: rgba(168, 197, 227, 0.2);
+  color: var(--color-text-main);
+}
+
+.nav-icon-img {
+  width: 22px;
+  height: 22px;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.nav-btn.active .nav-icon-img {
+  opacity: 0.8;
+  filter: grayscale(0%);
+}
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.pill-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: rgba(168, 197, 227, 0.2);
+  color: var(--color-text-main);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pill-btn:hover {
+  background: rgba(168, 197, 227, 0.3);
 }

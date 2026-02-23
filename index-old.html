@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>マッチングアプリ管理 - ホーム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style-new.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="supabaseClient.js"></script>
+    <script defer src="index.js"></script>
+  </head>
+  <body class="modern-body">
+    <header class="soft-header">
+      <h1>マッチング管理</h1>
+    </header>
+    
+    <nav class="soft-nav">
+      <a href="index.html" class="soft-nav-item active">ホーム</a>
+      <a href="profiles.html" class="soft-nav-item">相手</a>
+      <a href="events.html" class="soft-nav-item">登録</a>
+      <a href="calendar.html" class="soft-nav-item">戦歴</a>
+      <a href="account.html" class="soft-nav-item">設定</a>
+    </nav>
+    
+    <main class="soft-main">
+      <div id="line-notice" class="soft-notice" style="display:none;">
+        <p>LINE連携で通知を受け取れます <a href="account.html">設定する</a></p>
+      </div>
+      
+      <div class="soft-card advice-section">
+        <div class="card-header">
+          <img src="icons/robot.svg" alt="AI" class="icon-small">
+          <h2>アドバイス</h2>
+        </div>
+        <p id="advice-content" class="advice-text">読み込み中...</p>
+      </div>
+      
+      <div class="stats-row">
+        <div class="soft-card stat-item">
+          <img src="icons/users.svg" alt="登録相手" class="icon-small">
+          <div class="stat-info">
+            <div class="stat-label">登録相手</div>
+            <div class="stat-number"><span id="profiles-count">--</span>人</div>
+          </div>
+        </div>
+        <div class="soft-card stat-item">
+          <img src="icons/calendar.svg" alt="今後の予定" class="icon-small">
+          <div class="stat-info">
+            <div class="stat-label">今後の予定</div>
+            <div class="stat-number"><span id="upcoming-count">--</span>件</div>
+          </div>
+        </div>
+        <div class="soft-card stat-item">
+          <img src="icons/edit.svg" alt="更新待ち" class="icon-small">
+          <div class="stat-info">
+            <div class="stat-label">更新待ち</div>
+            <div class="stat-number"><span id="pending-count">--</span>件</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="soft-card">
+        <div class="card-header">
+          <img src="icons/chart.svg" alt="統計" class="icon-small">
+          <h2>統計</h2>
+          <select id="period-filter" class="soft-select">
+            <option value="3months">3ヶ月</option>
+            <option value="6months">6ヶ月</option>
+            <option value="1year">1年</option>
+            <option value="all">全期間</option>
+          </select>
+        </div>
+        <div class="soft-tabs">
+          <button class="soft-tab active" data-chart="status">ステータス</button>
+          <button class="soft-tab" data-chart="monthly">月別</button>
+          <button class="soft-tab" data-chart="app">アプリ</button>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="statsChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="soft-card">
+        <div class="card-header">
+          <img src="icons/edit.svg" alt="更新が必要" class="icon-small">
+          <h2>更新が必要なイベント</h2>
+        </div>
+        <ul id="pending-list" class="soft-list"></ul>
+      </div>
+    </main>
+    
+    <div class="soft-logout">
+      <a href="#" onclick="logout()">ログアウト</a>
+    </div>
+  </body>
+</html>

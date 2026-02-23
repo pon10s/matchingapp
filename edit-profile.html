@@ -2,10 +2,10 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>プロフィール登録／編集 - マッチングアプリ管理</title>
+    <title>プロフィール登録／編集 - Match Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
     <!-- Cropper.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <!-- Supabase client library -->
@@ -14,124 +14,295 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="supabaseClient.js"></script>
     <script defer src="edit-profile.js"></script>
+    <style>
+      .form-group {
+        margin-bottom: var(--spacing-md);
+      }
+      .form-group:last-child {
+        margin-bottom: 0;
+      }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1.5px solid #e5e7eb;
+        background: #ffffff;
+        font-size: 15px;
+        color: var(--color-text-main);
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .form-input:focus {
+        border-color: #a8c5e3;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(168, 197, 227, 0.15);
+      }
+      .form-input::placeholder {
+        color: #d1d5db;
+      }
+      select.form-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+      }
+      textarea.form-input {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .upload-card {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: var(--spacing-xl);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #fafafa;
+      }
+      .upload-card:hover {
+        border-color: #a8c5e3;
+        background: #f8fafc;
+      }
+      .primary-btn {
+        height: 50px;
+        border-radius: 18px;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: 16px;
+        background: linear-gradient(135deg, #F3B6C6, #AFC8E8);
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(175, 200, 232, 0.3);
+      }
+      .primary-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(175, 200, 232, 0.4);
+      }
+      .secondary-btn {
+        height: 50px;
+        border-radius: 18px;
+        border: 1.5px solid #e5e7eb;
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--color-text-main);
+        font-weight: 500;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .secondary-btn:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+      }
+      .end-reason-btn {
+        flex: 1;
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1.5px solid #e5e7eb;
+        background: #ffffff;
+        color: var(--color-text-main);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .end-reason-btn:hover {
+        border-color: #a8c5e3;
+        background: #f8fafc;
+      }
+      .end-reason-btn.active {
+        border-color: #a8c5e3;
+        background: rgba(168, 197, 227, 0.2);
+        color: #7BA7D1;
+        font-weight: 600;
+      }
+    </style>
   </head>
   <body>
-    <header>
-      <h1 id="page-title">プロフィール登録</h1>
-    </header>
-    <nav class="main-nav">
-      <a href="index.html">ホーム</a>
-      <a href="profiles.html" class="active">プロフィール一覧</a>
-      <a href="events.html">デート登録</a>
-      <a href="calendar.html">戦歴</a>
-      <a href="account.html">アカウント</a>
-    </nav>
-    <main>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left" style="cursor: pointer;" onclick="window.location.href='profiles.html'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span class="app-title" style="font-weight: 600; color: #4a5568;">プロフィール一覧</span>
+        </div>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main class="main-content">
       <section>
         <form id="profile-form">
           <input type="hidden" id="profileId" value="">
-          <!-- 名前 -->
-          <label>名前:
-            <input type="text" id="name" required placeholder="お相手の名前を入力">
-          </label>
-          <!-- 年齢 -->
-          <label>年齢:
-            <input type="number" id="age" placeholder="年齢">
-          </label>
-          <!-- 身長 -->
-          <label>身長 (cm):
-            <input type="number" id="height" placeholder="身長">
-          </label>
-          <!-- 学歴 -->
-          <label>学歴:
-            <input type="text" id="education" placeholder="最終学歴や出身校">
-          </label>
-          <!-- 年収 -->
-          <label>年収:
-            <select id="income">
-              <option value="">選択してください</option>
-              <option value="不明">不明</option>
-              <option value="〜300万">〜300万</option>
-              <option value="300〜500万">300〜500万</option>
-              <option value="500〜700万">500〜700万</option>
-              <option value="700〜1000万">700〜1000万</option>
-              <option value="1000〜1500万">1000〜1500万</option>
-              <option value="1500〜2000万">1500〜2000万</option>
-              <option value="2000〜3000万">2000〜3000万</option>
-              <option value="3000〜5000万">3000〜5000万</option>
-              <option value="5000万以上">5000万以上</option>
-            </select>
-          </label>
-          <!-- 職業 -->
-          <label>職業:
-            <input type="text" id="occupation" placeholder="職業">
-          </label>
-          <!-- 住み -->
-          <label>住み:
-            <input type="text" id="residence" placeholder="居住地">
-          </label>
-          <!-- ステータス -->
-          <label>ステータス:
-            <select id="status">
-              <option value="">選択してください</option>
-              <option value="本命">本命</option>
-              <option value="あり">あり</option>
-              <option value="わからない">わからない</option>
-              <option value="ビミョウ">ビミョウ</option>
-              <option value="大人の関係">大人の関係</option>
-              <option value="友達">友達</option>
-              <option value="終了">終了</option>
-            </select>
-          </label>
-          <!-- 終了理由（ステータスが「終了」の時のみ表示） -->
-          <div id="endReasonFields" style="display:none;">
-            <label>終了タイプ: <span style="color:red;">*</span>
-              <div style="margin-top:0.5rem;">
-                <label style="display:inline-block; margin-right:1rem;">
-                  <input type="radio" name="end_reason_type" value="自分起因"> 自分起因
-                </label>
-                <label style="display:inline-block; margin-right:1rem;">
-                  <input type="radio" name="end_reason_type" value="相手起因"> 相手起因
-                </label>
-                <label style="display:inline-block;">
-                  <input type="radio" name="end_reason_type" value="相互合意"> 相互合意
-                </label>
+          
+          <!-- ① 基本情報カード -->
+          <div class="card" style="margin-bottom: var(--spacing-md);">
+            <h3 class="card-title">基本情報</h3>
+            
+            <div class="form-group">
+              <label class="form-label">名前 <span style="color:#E6A5B8;">＊</span></label>
+              <input type="text" id="name" class="form-input" required placeholder="お相手の名前を入力">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);">
+              <div class="form-group">
+                <label class="form-label">年齢</label>
+                <input type="number" id="age" class="form-input" placeholder="年齢">
               </div>
-            </label>
-            <label>終了理由詳細:
-              <textarea id="end_reason_detail" placeholder="終了した理由を記録"></textarea>
-            </label>
+              <div class="form-group">
+                <label class="form-label">身長 (cm)</label>
+                <input type="number" id="height" class="form-input" placeholder="身長">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">学歴</label>
+              <input type="text" id="education" class="form-input" placeholder="最終学歴や出身校">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">年収</label>
+              <select id="income" class="form-input">
+                <option value="">選択してください</option>
+                <option value="不明">不明</option>
+                <option value="〜300万">〜300万</option>
+                <option value="300〜500万">300〜500万</option>
+                <option value="500〜700万">500〜700万</option>
+                <option value="700〜1000万">700〜1000万</option>
+                <option value="1000〜1500万">1000〜1500万</option>
+                <option value="1500〜2000万">1500〜2000万</option>
+                <option value="2000〜3000万">2000〜3000万</option>
+                <option value="3000〜5000万">3000〜5000万</option>
+                <option value="5000万以上">5000万以上</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">職業</label>
+              <input type="text" id="occupation" class="form-input" placeholder="職業">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">住み</label>
+              <input type="text" id="residence" class="form-input" placeholder="居住地">
+            </div>
           </div>
-          <!-- 出会ったアプリ -->
-          <label>出会ったアプリ:
-            <input type="text" id="app" placeholder="出会ったアプリ名">
-          </label>
-          <!-- どんな人 -->
-          <label>どんな人:
-            <textarea id="summary" placeholder="相手の特徴"></textarea>
-          </label>
-          <!-- メモ -->
-          <label>メモ:
-            <textarea id="memo" placeholder="自由メモ"></textarea>
-          </label>
-          <!-- 写真アップロード -->
-          <label>写真:
-            <input type="file" id="photo" accept="image/*">
-          </label>
-          <!-- プレビュー表示 -->
-          <div id="photoPreviewContainer" style="display:none; text-align:center; margin-bottom:1rem; max-width:100%; overflow:hidden;">
-            <img id="photoPreview" style="max-width:100%; display:block; margin:0 auto;">
-            <button type="button" id="cropBtn" style="margin-top:0.5rem; width:auto;">決定</button>
+          
+          <!-- ② 関係情報カード -->
+          <div class="card" style="margin-bottom: var(--spacing-md);">
+            <h3 class="card-title">関係情報</h3>
+            
+            <div class="form-group">
+              <label class="form-label">ステータス</label>
+              <select id="status" class="form-input">
+                <option value="">選択してください</option>
+                <option value="本命">本命</option>
+                <option value="あり">あり</option>
+                <option value="わからない">わからない</option>
+                <option value="ビミョウ">ビミョウ</option>
+                <option value="大人の関係">大人の関係</option>
+                <option value="友達">友達</option>
+                <option value="終了">終了</option>
+              </select>
+            </div>
+            
+            <div id="endReasonFields" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">終了タイプ <span style="color:#E6A5B8;">＊</span></label>
+                <input type="hidden" id="end_reason_type_hidden" value="">
+                <div style="display: flex; gap: var(--spacing-sm); margin-top: 8px;">
+                  <button type="button" class="end-reason-btn" data-value="自分起因">自分起因</button>
+                  <button type="button" class="end-reason-btn" data-value="相手起因">相手起因</button>
+                  <button type="button" class="end-reason-btn" data-value="双方合意">双方合意</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">終了理由詳細</label>
+                <textarea id="end_reason_detail" class="form-input" placeholder="終了した理由を記録" rows="3"></textarea>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">出会ったアプリ</label>
+              <input type="text" id="app" class="form-input" placeholder="出会ったアプリ名">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">どんな人</label>
+              <textarea id="summary" class="form-input" placeholder="相手の特徴" rows="3"></textarea>
+            </div>
           </div>
-          <button type="submit">保存</button>
-          <button type="button" id="cancelBtn">キャンセル</button>
+          
+          <!-- ③ メモ・写真カード -->
+          <div class="card" style="margin-bottom: var(--spacing-md);">
+            <h3 class="card-title">メモ・写真</h3>
+            
+            <div class="form-group">
+              <label class="form-label">メモ</label>
+              <textarea id="memo" class="form-input" placeholder="自由メモ" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">写真</label>
+              <div class="upload-card" onclick="document.getElementById('photo').click()">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p style="margin: 8px 0 0 0; font-size: 14px; color: #9ca3af;">クリックして写真を選択</p>
+              </div>
+              <input type="file" id="photo" accept="image/*" style="display: none;">
+            </div>
+            
+            <div id="photoPreviewContainer" style="display:none; margin-top: var(--spacing-md);">
+              <img id="photoPreview" style="max-width:100%; display:block; border-radius: 12px;">
+              <button type="button" id="cropBtn" class="secondary-btn" style="margin-top: var(--spacing-sm); width: 100%;">決定</button>
+            </div>
+          </div>
+          
+          <!-- アクションボタン -->
+          <div style="margin-top: var(--spacing-lg);">
+            <button type="submit" class="primary-btn" style="width: 100%;">保存</button>
+          </div>
         </form>
       </section>
-    </main>
-    <!-- 右下に固定表示するログアウトボタン -->
-    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
-    <footer>
-      <p>&copy;2026 マッチングアプリ管理</p>
-    </footer>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home-new.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn active">
+          <img src="icons/profiles-new.svg" alt="プロフィール" class="nav-icon-img">
+          <span class="nav-label">プロフィール</span>
+        </a>
+        <a href="events.html" class="nav-btn">
+          <img src="icons/calendar-new.svg" alt="デート登録" class="nav-icon-img">
+          <span class="nav-label">デート登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle-new.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="analytics.html" class="nav-btn">
+          <img src="icons/chart-new.svg" alt="分析" class="nav-icon-img">
+          <span class="nav-label">分析</span>
+        </a>
+        <a href="account.html" class="nav-btn">
+          <img src="icons/settings-new.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
   </body>
 </html>

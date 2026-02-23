@@ -2,54 +2,182 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>デート登録 - マッチングアプリ管理</title>
+    <title>デート登録 - Match Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
     <!-- Supabase client library and initialization -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
     <script defer src="events.js"></script>
+    <style>
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-label {
+        display: block;
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        height: 48px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1.5px solid #e5e7eb;
+        background: #ffffff;
+        font-size: 15px;
+        color: var(--color-text-main);
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .form-input:focus {
+        border-color: #a8c5e3;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(168, 197, 227, 0.15);
+      }
+      select.form-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 40px;
+      }
+      .time-chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .time-chip {
+        flex: 1;
+        min-width: calc(50% - 4px);
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1.5px solid #e5e7eb;
+        background: #ffffff;
+        color: var(--color-text-main);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+      }
+      .time-chip:hover {
+        border-color: #a8c5e3;
+        background: #f8fafc;
+      }
+      .time-chip.active {
+        border-color: #a8c5e3;
+        background: rgba(168, 197, 227, 0.2);
+        color: #7BA7D1;
+        font-weight: 600;
+      }
+      .cta-btn {
+        width: 90%;
+        max-width: 320px;
+        height: 48px;
+        border-radius: 24px;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        font-size: 16px;
+        background: linear-gradient(135deg, #F3B6C6, #AFC8E8);
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(175, 200, 232, 0.3);
+        margin: 20px auto 0;
+        display: block;
+      }
+      .cta-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(175, 200, 232, 0.4);
+      }
+    </style>
   </head>
   <body>
-    <header>
-      <h1>デート登録</h1>
-    </header>
-    <nav class="main-nav">
-      <a href="index.html">ホーム</a>
-      <a href="profiles.html">プロフィール一覧</a>
-      <a href="events.html" class="active">デート登録</a>
-      <a href="calendar.html">戦歴</a>
-      <a href="account.html">アカウント</a>
-    </nav>
-    <main>
-      <section>
-        <h2>予定を追加</h2>
-        <form id="event-form">
-          <!-- 編集時に利用するIDを格納する隠しフィールド -->
-          <input type="hidden" id="eventId" value="">
-          <label>相手:
-            <select id="profileSelect"></select>
-          </label>
-          <label>日付:
-            <input type="date" id="eventDate" required>
-          </label>
-          <!-- 感想の入力は編集モードのみで表示 -->
-          <div id="commentField" style="display:none;">
-            <label>感想:
-              <textarea id="eventNote" placeholder="デートの感想を入力" rows="3"></textarea>
-            </label>
-          </div>
-          <button type="submit" id="eventSubmitBtn">追加</button>
-          <!-- 編集モードを知らせるインジケーター -->
-          <div id="editingIndicator" style="display:none; color: var(--text); font-weight:bold; margin-top:0.5rem;">編集中</div>
-        </form>
-      </section>
-    </main>
-    <!-- 右下に固定表示するログアウトボタン -->
-    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
-    <footer>
-      <p>&copy;2026 マッチングアプリ管理</p>
-    </footer>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left" style="cursor: pointer;" onclick="location.href='index.html'">
+          <img src="icons/calendar_logo_colorful.svg" alt="logo" class="logo-icon">
+          <span class="app-title">Match L<span style="color:#D4869C;">o</span><span style="color:#7BA7D1;">g</span></span>
+        </div>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main class="main-content">
+        <h2 class="section-title" style="margin-bottom: 24px;">デート登録</h2>
+        
+        <div class="card">
+          <form id="event-form">
+            <input type="hidden" id="eventId" value="">
+            <input type="hidden" id="eventType" value="">
+            
+            <div class="form-group">
+              <label class="form-label">相手</label>
+              <select id="profileSelect" class="form-input" required>
+                <option value="">選択してください</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">日付</label>
+              <input type="date" id="eventDate" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">時間帯</label>
+              <div class="time-chips">
+                <div class="time-chip" data-value="morning">モーニング</div>
+                <div class="time-chip" data-value="lunch">ランチ</div>
+                <div class="time-chip" data-value="cafe">カフェ</div>
+                <div class="time-chip" data-value="dinner">ディナー</div>
+              </div>
+            </div>
+            
+            <div id="commentField" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">感想</label>
+                <textarea id="eventNote" class="form-input" placeholder="デートの感想を入力" rows="3" style="height: auto; padding: 12px 14px;"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <button type="submit" form="event-form" class="cta-btn" id="eventSubmitBtn">登録</button>
+        <div id="editingIndicator" style="display:none; color: var(--color-text-main); font-weight:bold; margin-top:12px; text-align:center;">編集中</div>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home-new.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn">
+          <img src="icons/profiles-new.svg" alt="プロフィール" class="nav-icon-img">
+          <span class="nav-label">プロフィール</span>
+        </a>
+        <a href="events.html" class="nav-btn active">
+          <img src="icons/calendar-new.svg" alt="デート登録" class="nav-icon-img">
+          <span class="nav-label">デート登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle-new.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="analytics.html" class="nav-btn">
+          <img src="icons/chart-new.svg" alt="分析" class="nav-icon-img">
+          <span class="nav-label">分析</span>
+        </a>
+        <a href="account.html" class="nav-btn">
+          <img src="icons/settings-new.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
   </body>
 </html>

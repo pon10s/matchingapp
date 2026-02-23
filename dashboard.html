@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Log</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- ヘッダー -->
+    <header class="glass-header">
+      <div class="header-left">
+        <img src="icons/カレンダー.PNG" alt="logo" class="logo-icon">
+        <span class="app-title">Match Log</span>
+      </div>
+      <button class="pill-btn">ログアウト</button>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">ダッシュボード</h1>
+      </div>
+
+      <!-- まちあぷネキからのアドバイス -->
+      <section class="card advice-card">
+        <div class="advice-content">
+          <h2 class="advice-title">まちあぷネキからのアドバイス</h2>
+          <p class="advice-text">
+            今週は3件の予定があります！<br>
+            デート前には相手のプロフィールを<br>
+            もう一度確認しておきましょう✨
+          </p>
+        </div>
+        <div class="neki-illustration">
+          <img id="neki-img" src="icons/まちあぷネキ.png" alt="まちあぷネキ">
+        </div>
+      </section>
+
+      <!-- KPIカード -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-value">12</div>
+          <div class="kpi-label">登録相手</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">3</div>
+          <div class="kpi-label">今後の予定</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value">8</div>
+          <div class="kpi-label">戦歴</div>
+        </div>
+      </div>
+
+      <!-- 今週の予定 -->
+      <section class="card schedule-card">
+        <h2 class="card-title">今週の予定</h2>
+        <div class="schedule-list">
+          <div class="schedule-item">
+            <div class="avatar"></div>
+            <div class="schedule-info">
+              <div class="schedule-name">田中さん</div>
+              <div class="schedule-time">明日</div>
+            </div>
+            <span class="pill-tag">カフェ</span>
+          </div>
+          <div class="schedule-item">
+            <div class="avatar"></div>
+            <div class="schedule-info">
+              <div class="schedule-name">佐藤さん</div>
+              <div class="schedule-time">3/15</div>
+            </div>
+            <span class="pill-tag">ディナー</span>
+          </div>
+          <div class="schedule-item">
+            <div class="avatar"></div>
+            <div class="schedule-info">
+              <div class="schedule-name">鈴木さん</div>
+              <div class="schedule-time">3/20</div>
+            </div>
+            <span class="pill-tag">ランチ</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 下部固定ナビ -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active">
+        <img src="icons/home.svg" alt="ホーム" class="nav-icon-img">
+        <span class="nav-label">ホーム</span>
+      </button>
+      <button class="nav-btn">
+        <img src="icons/profiles.svg" alt="相手" class="nav-icon-img">
+        <span class="nav-label">相手</span>
+      </button>
+      <button class="nav-btn">
+        <img src="icons/plus.svg" alt="登録" class="nav-icon-img">
+        <span class="nav-label">登録</span>
+      </button>
+      <button class="nav-btn">
+        <img src="icons/battle.svg" alt="戦歴" class="nav-icon-img">
+        <span class="nav-label">戦歴</span>
+      </button>
+      <button class="nav-btn">
+        <img src="icons/settings.svg" alt="設定" class="nav-icon-img">
+        <span class="nav-label">設定</span>
+      </button>
+    </nav>
+  </div>
+  <script>
+    // まちあぷネキ画像をランダムに表示
+    const nekiImages = [
+      'icons/まちあぷネキ1.png',
+      'icons/まちあぷネキ2.png',
+      'icons/まちあぷネキ3.png',
+      'icons/まちあぷネキ4.png'
+    ];
+    const randomIndex = Math.floor(Math.random() * nekiImages.length);
+    document.getElementById('neki-img').src = nekiImages[randomIndex];
+  </script>
+</body>
+</html>

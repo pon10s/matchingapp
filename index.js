@@ -7,6 +7,17 @@ let allEvents = [];
 let currentPeriod = '3months';
 let currentChartType = 'status';
 
+// 時間帯を日本語表記に変換
+function formatEventType(eventType) {
+  const typeMap = {
+    'morning': 'モーニング',
+    'lunch': 'ランチ',
+    'cafe': 'カフェ',
+    'dinner': 'ディナー'
+  };
+  return typeMap[eventType] || '';
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
   console.log('DOMContentLoaded fired');
   // ログインしていない場合はログインページへリダイレクトします
@@ -194,11 +205,14 @@ async function loadStatsAndPending() {
   const user = await ensureLoggedIn();
   if (!user) return;
   const today = new Date().toISOString().slice(0, 10);
+  const nextWeek = new Date();
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  const nextWeekStr = nextWeek.toISOString().slice(0, 10);
   console.log('Today:', today);
   // プロフィールとイベントを取得
   const { data: profiles, error: profError } = await supabaseClient
     .from('profiles')
-    .select('id, name, status, summary, app')
+    .select('id, name, status, summary, app, photo_url')
     .eq('user_id', user.id);
   if (profError) {
     console.error('Profile error:', profError);
@@ -207,7 +221,7 @@ async function loadStatsAndPending() {
   console.log('Profiles:', profiles);
   const { data: events, error: evError } = await supabaseClient
     .from('events')
-    .select('id, profile_id, event_date, comment')
+    .select('id, profile_id, event_date, comment, event_type')
     .eq('user_id', user.id);
   if (evError) {
     console.error('Events error:', evError);
@@ -235,20 +249,95 @@ async function loadStatsAndPending() {
   });
   document.getElementById('pending-count').textContent = pendingEvents.length;
   console.log('Set pending-count to:', pendingEvents.length);
+  
+  // 今週の予定を表示
+  const weekEvents = allEvents.filter(ev => ev.event_date >= today && ev.event_date <= nextWeekStr);
+  renderWeekSchedule(weekEvents, allProfiles);
+  
   renderPendingList(pendingEvents, allProfiles);
   
   // グラフ描画
   drawChart();
 }
 
-// 更新が必要なイベントのリストを描画し、各アイテムで感想とステータスを更新できるようにする
+// 今週の予定を表示
+async function renderWeekSchedule(weekEvents, profiles) {
+  const scheduleListEl = document.getElementById('schedule-list');
+  scheduleListEl.innerHTML = '';
+  
+  if (!weekEvents || weekEvents.length === 0) {
+    const div = document.createElement('div');
+    div.className = 'schedule-item';
+    div.innerHTML = '<div class="schedule-info"><div class="schedule-time">予定なし</div></div>';
+    scheduleListEl.appendChild(div);
+    return;
+  }
+  
+  // 日付順に並び替え
+  weekEvents.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+  
+  for (const ev of weekEvents) {
+    const profile = profiles.find(p => p.id === ev.profile_id);
+    const div = document.createElement('div');
+    div.className = 'schedule-item';
+    div.style.cursor = 'pointer';
+    div.onclick = () => location.href = `edit-event.html?id=${ev.id}&from=index`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    
+    // プロフィール画像があれば表示
+    if (profile && profile.photo_url) {
+      const img = document.createElement('img');
+      img.src = profile.photo_url;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '50%';
+      avatar.appendChild(img);
+    }
+    
+    div.appendChild(avatar);
+    
+    const info = document.createElement('div');
+    info.className = 'schedule-info';
+    
+    const date = document.createElement('div');
+    date.className = 'schedule-time';
+    date.textContent = formatDateJP(ev.event_date);
+    info.appendChild(date);
+    
+    const name = document.createElement('div');
+    name.className = 'schedule-name';
+    name.textContent = profile ? profile.name : '不明';
+    info.appendChild(name);
+    
+    div.appendChild(info);
+    
+    const tag = document.createElement('span');
+    tag.className = 'pill-tag';
+    const eventTypeText = ev.event_type ? formatEventType(ev.event_type) : '未定';
+    tag.textContent = eventTypeText;
+    tag.style.background = 'rgba(210, 180, 160, 0.35)';
+    tag.style.color = '#8b7355';
+    div.appendChild(tag);
+    
+    scheduleListEl.appendChild(div);
+  }
+}
+
+// 予定が終わったデートのリストを描画し、各アイテムで感想とステータスを更新できるようにする
 async function renderPendingList(pendingEvents, profiles) {
   const pendingListEl = document.getElementById('pending-list');
   pendingListEl.innerHTML = '';
   if (!pendingEvents || pendingEvents.length === 0) {
-    const li = document.createElement('li');
-    li.textContent = '更新が必要なイベントはありません。';
-    pendingListEl.appendChild(li);
+    const div = document.createElement('div');
+    div.style.textAlign = 'center';
+    div.style.color = 'var(--color-text-light)';
+    div.style.fontSize = '13px';
+    div.style.padding = 'var(--spacing-md)';
+    div.textContent = '予定が終わったデートはありません';
+    pendingListEl.appendChild(div);
     return;
   }
   // ステータス選択肢
@@ -258,39 +347,138 @@ async function renderPendingList(pendingEvents, profiles) {
   const user = await ensureLoggedIn();
   for (const ev of pendingEvents) {
     const profile = profiles.find(p => p.id === ev.profile_id);
-    const li = document.createElement('li');
-    li.style.marginBottom = '1rem';
-    // 日付と名前
+    const card = document.createElement('div');
+    card.style.background = 'rgba(255,255,255,0.4)';
+    card.style.borderRadius = 'var(--radius-medium)';
+    card.style.padding = 'var(--spacing-md)';
+    card.style.marginBottom = 'var(--spacing-sm)';
+    
+    // ヘッダー（今週の予定と同じレイアウト）
     const header = document.createElement('div');
-    // 日付を日本形式に変換
-    header.textContent = `${formatDateJP(ev.event_date)} ${profile ? profile.name : ''}`;
-    li.appendChild(header);
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.gap = 'var(--spacing-sm)';
+    header.style.marginBottom = 'var(--spacing-sm)';
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.style.width = '40px';
+    avatar.style.height = '40px';
+    
+    // プロフィール画像があれば表示
+    if (profile && profile.photo_url) {
+      const img = document.createElement('img');
+      img.src = profile.photo_url;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '50%';
+      avatar.appendChild(img);
+    }
+    
+    header.appendChild(avatar);
+    
+    const info = document.createElement('div');
+    info.style.flex = '1';
+    
+    const date = document.createElement('div');
+    date.style.fontSize = '12px';
+    date.style.color = 'var(--color-text-light)';
+    date.textContent = formatDateJP(ev.event_date);
+    info.appendChild(date);
+    
+    const name = document.createElement('div');
+    name.style.fontWeight = '600';
+    name.style.fontSize = '14px';
+    name.style.color = 'var(--color-text-main)';
+    name.textContent = profile ? profile.name : '不明';
+    info.appendChild(name);
+    
+    header.appendChild(info);
+    
+    const tag = document.createElement('span');
+    tag.className = 'pill-tag';
+    const eventTypeText = ev.event_type ? formatEventType(ev.event_type) : '未定';
+    tag.textContent = eventTypeText;
+    tag.style.background = 'rgba(210, 180, 160, 0.35)';
+    tag.style.color = '#8b7355';
+    header.appendChild(tag);
+    
+    card.appendChild(header);
+    
     // 感想入力
-    const noteInput = document.createElement('input');
-    noteInput.type = 'text';
+    const noteInput = document.createElement('textarea');
     noteInput.placeholder = '感想を入力';
-    noteInput.style.marginRight = '0.5rem';
-    li.appendChild(noteInput);
-    // ステータス選択（任意）
+    noteInput.style.width = '100%';
+    noteInput.style.padding = '0.5rem';
+    noteInput.style.border = '1px solid rgba(120,150,190,0.18)';
+    noteInput.style.borderRadius = 'var(--radius-medium)';
+    noteInput.style.background = 'rgba(255,255,255,0.8)';
+    noteInput.style.fontSize = '13px';
+    noteInput.style.marginBottom = 'var(--spacing-sm)';
+    noteInput.style.resize = 'vertical';
+    noteInput.style.minHeight = '60px';
+    noteInput.style.fontFamily = 'inherit';
+    noteInput.style.color = 'var(--color-text-main)';
+    card.appendChild(noteInput);
+    
+    // ステータス選択
     const statusSelect = document.createElement('select');
-    statusOptions.forEach(opt => {
+    statusSelect.style.width = '100%';
+    statusSelect.style.padding = '0.5rem';
+    statusSelect.style.border = '1px solid rgba(120,150,190,0.18)';
+    statusSelect.style.borderRadius = 'var(--radius-medium)';
+    statusSelect.style.background = 'rgba(255,255,255,0.8)';
+    statusSelect.style.fontSize = '13px';
+    statusSelect.style.marginBottom = 'var(--spacing-sm)';
+    statusSelect.style.color = '#ccc';
+    statusOptions.forEach((opt, index) => {
       const optionEl = document.createElement('option');
       optionEl.value = opt;
       optionEl.textContent = opt === '' ? 'ステータス変更なし' : opt;
+      if (index === 0) {
+        optionEl.style.color = '#ccc';
+      } else {
+        optionEl.style.color = 'var(--color-text-main)';
+      }
       statusSelect.appendChild(optionEl);
     });
-    statusSelect.style.marginRight = '0.5rem';
-    li.appendChild(statusSelect);
+    statusSelect.addEventListener('change', (e) => {
+      if (e.target.value === '') {
+        e.target.style.color = '#ccc';
+      } else {
+        e.target.style.color = 'var(--color-text-main)';
+      }
+    });
+    card.appendChild(statusSelect);
+    
     // 更新ボタン
     const updateBtn = document.createElement('button');
     updateBtn.textContent = '更新';
+    updateBtn.style.background = 'rgba(168, 197, 227, 0.2)';
+    updateBtn.style.color = 'var(--color-text-main)';
+    updateBtn.style.padding = '6px 16px';
+    updateBtn.style.width = '90px';
+    updateBtn.style.border = 'none';
+    updateBtn.style.borderRadius = 'var(--radius-pill)';
+    updateBtn.style.cursor = 'pointer';
+    updateBtn.style.fontSize = '13px';
+    updateBtn.style.fontWeight = '500';
+    updateBtn.style.margin = '0 auto';
+    updateBtn.style.display = 'block';
+    updateBtn.style.transition = 'all 0.2s';
+    updateBtn.addEventListener('mouseover', () => {
+      updateBtn.style.background = 'rgba(168, 197, 227, 0.3)';
+    });
+    updateBtn.addEventListener('mouseout', () => {
+      updateBtn.style.background = 'rgba(168, 197, 227, 0.2)';
+    });
     updateBtn.addEventListener('click', async () => {
       const note = noteInput.value.trim();
       if (!note) {
         alert('感想を入力してください');
         return;
       }
-      // イベントの感想を更新
       const { error: updEventErr } = await supabaseClient
         .from('events')
         .update({ comment: note })
@@ -300,7 +488,6 @@ async function renderPendingList(pendingEvents, profiles) {
         alert(updEventErr.message);
         return;
       }
-      // ステータスが選択されている場合はプロフィールのステータスを更新
       const newStatus = statusSelect.value;
       if (newStatus) {
         const { error: updProfErr } = await supabaseClient
@@ -313,11 +500,11 @@ async function renderPendingList(pendingEvents, profiles) {
           return;
         }
       }
-      // 再読み込み
       await loadStatsAndPending();
     });
-    li.appendChild(updateBtn);
-    pendingListEl.appendChild(li);
+    card.appendChild(updateBtn);
+    
+    pendingListEl.appendChild(card);
   }
 }
 

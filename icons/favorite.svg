@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Favorite">
+<title>Favorite</title>
+
+<path fill="var(--accent,#E6A5B8)" stroke="var(--accent,#E6A5B8)" stroke-width="1" d="M12 20s-7-4.3-7-9.2C5 8.1 7.1 6 9.8 6c1.2 0 2.3.5 3 1.4.7-.9 1.8-1.4 3-1.4 2.7 0 4.8 2.1 4.8 4.8C20.6 15.7 12 20 12 20z"/>
+<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4.6 8.2l.6-1.5 1.5-.6-1.5-.6-.6-1.5-.6 1.5-1.5.6 1.5.6z"/>
+
+</svg>

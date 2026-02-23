@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分析 - Match Log</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabaseClient.js"></script>
+  <script defer src="analytics.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="glass-header">
+      <div class="header-left" style="cursor: pointer;" onclick="location.href='index.html'">
+        <img src="icons/calendar_logo_colorful.svg" alt="logo" class="logo-icon">
+        <span class="app-title">Match L<span style="color:#D4869C;">o</span><span style="color:#7BA7D1;">g</span></span>
+      </div>
+      <button class="pill-btn" onclick="logout()">ログアウト</button>
+    </header>
+
+    <main class="main-content">
+      <h2 class="section-title" style="margin-bottom: 24px;">分析</h2>
+
+      <!-- 期間セレクタ -->
+      <div style="display: flex; gap: 8px; margin-bottom: var(--spacing-xl); justify-content: center;">
+        <button class="period-btn" data-period="1">1ヶ月</button>
+        <button class="period-btn active" data-period="3">3ヶ月</button>
+        <button class="period-btn" data-period="6">6ヶ月</button>
+        <button class="period-btn" data-period="all">全期間</button>
+      </div>
+      
+      <style>
+        .period-btn {
+          flex: 1;
+          max-width: 100px;
+          height: 36px;
+          border-radius: 18px;
+          border: 1.5px solid rgba(168, 197, 227, 0.3);
+          background: rgba(255, 255, 255, 0.6);
+          color: var(--color-text-main);
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .period-btn:hover {
+          background: rgba(168, 197, 227, 0.2);
+          border-color: rgba(168, 197, 227, 0.5);
+        }
+        .period-btn.active {
+          background: rgba(168, 197, 227, 0.85);
+          border-color: #A8C5E3;
+          color: white;
+          font-weight: 600;
+        }
+      </style>
+
+      <!-- KPIサマリー -->
+      <div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: var(--spacing-xl);">
+        <div class="kpi-card">
+          <div class="kpi-value"><span id="new-profiles">--</span></div>
+          <div class="kpi-label">新規登録増減</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value"><span id="event-change">--</span></div>
+          <div class="kpi-label">デート件数増減</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value"><span id="active-profiles">--</span></div>
+          <div class="kpi-label">進行中人数</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value"><span id="second-date-rate">--%</span></div>
+          <div class="kpi-label">2回目到達率</div>
+        </div>
+      </div>
+
+      <!-- グラフセクション -->
+      <div class="card">
+        <!-- タブ切替 -->
+        <div style="display: flex; justify-content: center; gap: 24px; margin-bottom: var(--spacing-lg); border-bottom: 1px solid rgba(120, 150, 190, 0.15); padding-bottom: 12px;">
+          <a href="#" class="chart-tab active" data-tab="status">ステータス</a>
+          <a href="#" class="chart-tab" data-tab="profiles">登録人数</a>
+          <a href="#" class="chart-tab" data-tab="events">デート件数</a>
+          <a href="#" class="chart-tab" data-tab="app">利用アプリ</a>
+        </div>
+        
+        <style>
+          .chart-tab {
+            font-size: 14px;
+            font-weight: 500;
+            color: #9ca3af;
+            text-decoration: none;
+            padding-bottom: 12px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+            top: 13px;
+          }
+          .chart-tab:hover {
+            color: #7BA7D1;
+          }
+          .chart-tab.active {
+            color: #7BA7D1;
+            border-bottom-color: #7BA7D1;
+            font-weight: 600;
+          }
+        </style>
+        
+        <h3 class="card-title" id="chart-title">ステータス別分布</h3>
+        <div style="position: relative; height: 300px; margin-bottom: var(--spacing-md);">
+          <canvas id="analyticsChart"></canvas>
+        </div>
+        <div id="chart-legend" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;"></div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-btn">
+        <img src="icons/home-new.svg" alt="ホーム" class="nav-icon-img">
+        <span class="nav-label">ホーム</span>
+      </a>
+      <a href="profiles.html" class="nav-btn">
+        <img src="icons/profiles-new.svg" alt="プロフィール" class="nav-icon-img">
+        <span class="nav-label">プロフィール</span>
+      </a>
+      <a href="events.html" class="nav-btn">
+        <img src="icons/calendar-new.svg" alt="デート登録" class="nav-icon-img">
+        <span class="nav-label">デート登録</span>
+      </a>
+      <a href="calendar.html" class="nav-btn">
+        <img src="icons/battle-new.svg" alt="戦歴" class="nav-icon-img">
+        <span class="nav-label">戦歴</span>
+      </a>
+      <a href="analytics.html" class="nav-btn active">
+        <img src="icons/chart-new.svg" alt="分析" class="nav-icon-img">
+        <span class="nav-label">分析</span>
+      </a>
+      <a href="account.html" class="nav-btn">
+        <img src="icons/settings-new.svg" alt="設定" class="nav-icon-img">
+        <span class="nav-label">設定</span>
+      </a>
+    </nav>
+  </div>
+</body>
+</html>

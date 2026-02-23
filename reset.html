@@ -2,33 +2,36 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>パスワード再発行 - マッチングアプリ管理</title>
+    <title>パスワード再発行 - Match Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&family=Yomogi&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
     <!-- Supabase client library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
   </head>
   <body>
-    <header>
-      <h1>パスワード再発行</h1>
-    </header>
-    <main>
-      <section>
-        <h2>パスワード再発行</h2>
-        <p>登録済みのメールアドレスを入力してください。再発行用のリンクを送信します。</p>
-        <form id="reset-form">
-          <label>メールアドレス:
-            <input type="email" id="reset-email" required>
-          </label>
-          <button type="submit">送信</button>
+    <div class="login-container">
+      <section class="auth-card">
+        <h2 class="auth-title">パスワード再発行</h2>
+        <p style="font-size: 14px; color: #6b7280; margin-bottom: 24px; text-align: center;">登録済みのメールアドレスを入力してください。<br>再発行用のリンクを送信します。</p>
+        <form id="reset-form" class="auth-form">
+          <div class="form-group">
+            <label class="form-label">メールアドレス</label>
+            <input type="email" id="reset-email" class="form-input" required>
+          </div>
+          <button type="submit" class="primary-btn">送信</button>
         </form>
-        <div style="margin-top:1rem;">
-          <a href="login.html" class="back-btn">戻る</a>
+        <div class="auth-back">
+          <a href="login.html" class="text-link" style="text-decoration: none;">← 戻る</a>
         </div>
       </section>
-    </main>
+    </div>
+      </section>
+    </div>
     <script>
       document.getElementById('reset-form').addEventListener('submit', async function(e) {
         e.preventDefault();

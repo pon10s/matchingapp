@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>プロフィール登録／編集 - Match Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <!-- Supabase client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="supabaseClient.js"></script>
+    <script defer src="edit-profile.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left">
+          <img src="icons/calendar_logo_colorful.svg" alt="logo" class="logo-icon">
+          <span class="app-title">Match L<span style="color:#D4869C;">o</span><span style="color:#7BA7D1;">g</span></span>
+        </div>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main style="padding:var(--spacing-lg);">
+      <section>
+        <form id="profile-form">
+          <input type="hidden" id="profileId" value="">
+          <!-- 名前 -->
+          <label>名前:
+            <input type="text" id="name" required placeholder="お相手の名前を入力">
+          </label>
+          <!-- 年齢 -->
+          <label>年齢:
+            <input type="number" id="age" placeholder="年齢">
+          </label>
+          <!-- 身長 -->
+          <label>身長 (cm):
+            <input type="number" id="height" placeholder="身長">
+          </label>
+          <!-- 学歴 -->
+          <label>学歴:
+            <input type="text" id="education" placeholder="最終学歴や出身校">
+          </label>
+          <!-- 年収 -->
+          <label>年収:
+            <select id="income">
+              <option value="">選択してください</option>
+              <option value="不明">不明</option>
+              <option value="〜300万">〜300万</option>
+              <option value="300〜500万">300〜500万</option>
+              <option value="500〜700万">500〜700万</option>
+              <option value="700〜1000万">700〜1000万</option>
+              <option value="1000〜1500万">1000〜1500万</option>
+              <option value="1500〜2000万">1500〜2000万</option>
+              <option value="2000〜3000万">2000〜3000万</option>
+              <option value="3000〜5000万">3000〜5000万</option>
+              <option value="5000万以上">5000万以上</option>
+            </select>
+          </label>
+          <!-- 職業 -->
+          <label>職業:
+            <input type="text" id="occupation" placeholder="職業">
+          </label>
+          <!-- 住み -->
+          <label>住み:
+            <input type="text" id="residence" placeholder="居住地">
+          </label>
+          <!-- ステータス -->
+          <label>ステータス:
+            <select id="status">
+              <option value="">選択してください</option>
+              <option value="本命">本命</option>
+              <option value="あり">あり</option>
+              <option value="わからない">わからない</option>
+              <option value="ビミョウ">ビミョウ</option>
+              <option value="大人の関係">大人の関係</option>
+              <option value="友達">友達</option>
+              <option value="終了">終了</option>
+            </select>
+          </label>
+          <!-- 終了理由（ステータスが「終了」の時のみ表示） -->
+          <div id="endReasonFields" style="display:none;">
+            <label>終了タイプ: <span style="color:red;">*</span>
+              <div style="margin-top:0.5rem;">
+                <label style="display:inline-block; margin-right:1rem;">
+                  <input type="radio" name="end_reason_type" value="自分起因"> 自分起因
+                </label>
+                <label style="display:inline-block; margin-right:1rem;">
+                  <input type="radio" name="end_reason_type" value="相手起因"> 相手起因
+                </label>
+                <label style="display:inline-block;">
+                  <input type="radio" name="end_reason_type" value="相互合意"> 相互合意
+                </label>
+              </div>
+            </label>
+            <label>終了理由詳細:
+              <textarea id="end_reason_detail" placeholder="終了した理由を記録"></textarea>
+            </label>
+          </div>
+          <!-- 出会ったアプリ -->
+          <label>出会ったアプリ:
+            <input type="text" id="app" placeholder="出会ったアプリ名">
+          </label>
+          <!-- どんな人 -->
+          <label>どんな人:
+            <textarea id="summary" placeholder="相手の特徴"></textarea>
+          </label>
+          <!-- メモ -->
+          <label>メモ:
+            <textarea id="memo" placeholder="自由メモ"></textarea>
+          </label>
+          <!-- 写真アップロード -->
+          <label>写真:
+            <input type="file" id="photo" accept="image/*">
+          </label>
+          <!-- プレビュー表示 -->
+          <div id="photoPreviewContainer" style="display:none; text-align:center; margin-bottom:1rem; max-width:100%; overflow:hidden;">
+            <img id="photoPreview" style="max-width:100%; display:block; margin:0 auto;">
+            <button type="button" id="cropBtn" style="margin-top:0.5rem; width:auto;">決定</button>
+          </div>
+          <button type="submit">保存</button>
+          <button type="button" id="cancelBtn">キャンセル</button>
+        </form>
+      </section>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn active">
+          <img src="icons/profiles.svg" alt="相手" class="nav-icon-img">
+          <span class="nav-label">相手</span>
+        </a>
+        <a href="events.html" class="nav-btn">
+          <img src="icons/plus.svg" alt="登録" class="nav-icon-img">
+          <span class="nav-label">登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="account.html" class="nav-btn">
+          <img src="icons/settings.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
+  </body>
+</html>

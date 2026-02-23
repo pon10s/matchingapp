@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!user) return;
   const idParam = getQueryParam('id');
   const form = document.getElementById('profile-form');
-  const cancelBtn = document.getElementById('cancelBtn');
   const photoInput = document.getElementById('photo');
   const photoPreviewContainer = document.getElementById('photoPreviewContainer');
   const photoPreview = document.getElementById('photoPreview');
@@ -28,10 +27,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       reader.onload = (e) => {
         photoPreview.src = e.target.result;
         photoPreviewContainer.style.display = 'block';
+        cropBtn.style.display = 'block';
         // Cropper初期化前にクラスをクリア
         photoPreview.classList.remove('cropper-hidden');
         photoPreview.style.display = 'block';
         photoPreview.style.visibility = 'visible';
+        photoPreview.style.maxWidth = '100%';
+        photoPreview.style.margin = '0';
         // Cropper初期化
         if (cropper) {
           cropper.destroy();
@@ -39,8 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // スマホ対応: コンテナのサイズを明示的に設定
         photoPreviewContainer.style.maxWidth = '100%';
         photoPreviewContainer.style.height = 'auto';
-        photoPreview.style.maxWidth = '100%';
-        photoPreview.style.display = 'block';
         
         // 画像読み込み後にCropperを初期化
         setTimeout(() => {
@@ -75,17 +75,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (cropper) {
       cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob((blob) => {
         croppedBlob = blob;
-        // Cropperを破棄してプレビューを非表示
-        cropper.destroy();
-        cropper = null;
-        photoPreviewContainer.style.display = 'none';
+        // Cropperを破棄してトリミング後の画像を表示
+        const croppedUrl = URL.createObjectURL(blob);
+        if (cropper) {
+          cropper.destroy();
+          cropper = null;
+        }
+        photoPreview.src = croppedUrl;
+        photoPreview.style.maxWidth = '200px';
+        photoPreview.style.margin = '0 auto';
+        photoPreview.style.display = 'block';
+        photoPreview.style.borderRadius = '12px';
+        cropBtn.style.display = 'none';
         alert('トリミング完了！保存してください。');
       }, 'image/jpeg', 0.9);
     }
   });
   if (idParam) {
     // 編集モード
-    document.getElementById('page-title').textContent = 'プロフィール編集';
     document.getElementById('profileId').value = idParam;
     // プロフィール取得
     const { data: profile, error } = await supabaseClient
@@ -107,8 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('status').value = profile.status || '';
       // 終了理由の読み込み
       if (profile.end_reason_type) {
-        const radio = document.querySelector(`input[name="end_reason_type"][value="${profile.end_reason_type}"]`);
-        if (radio) radio.checked = true;
+        const btn = document.querySelector(`.end-reason-btn[data-value="${profile.end_reason_type}"]`);
+        if (btn) {
+          btn.classList.add('active');
+          document.getElementById('end_reason_type_hidden').value = profile.end_reason_type;
+        }
       }
       document.getElementById('end_reason_detail').value = profile.end_reason_detail || '';
       // ステータスが「終了」なら終了理由フィールド表示
@@ -119,33 +129,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('summary').value = profile.summary || '';
       document.getElementById('memo').value = profile.memo || '';
       if (profile.photo_url) {
+        // 編集モードで既存画像がある場合は表示のみ
         photoPreview.src = profile.photo_url;
+        photoPreview.style.maxWidth = '200px';
+        photoPreview.style.margin = '0 auto';
+        photoPreview.style.display = 'block';
+        photoPreview.style.borderRadius = '12px';
         photoPreviewContainer.style.display = 'block';
-        // Cropper初期化
-        if (cropper) {
-          cropper.destroy();
-        }
-        cropper = new Cropper(photoPreview, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-          responsive: true
-        });
+        cropBtn.style.display = 'none';
       }
     }
   }
   
   // ステータス変更時の終了理由フィールド表示/非表示
-  document.getElementById('status').addEventListener('change', (e) => {
-    const endReasonFields = document.getElementById('endReasonFields');
+  const statusSelect = document.getElementById('status');
+  const endReasonFields = document.getElementById('endReasonFields');
+  
+  statusSelect.addEventListener('change', (e) => {
     if (e.target.value === '終了') {
       endReasonFields.style.display = 'block';
     } else {
       endReasonFields.style.display = 'none';
       // 値をクリア
-      document.querySelectorAll('input[name="end_reason_type"]').forEach(r => r.checked = false);
+      document.querySelectorAll('.end-reason-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('end_reason_type_hidden').value = '';
       document.getElementById('end_reason_detail').value = '';
     }
+  });
+  
+  // 初期表示時にステータスが「終了」なら終了理由フィールドを表示
+  if (statusSelect.value === '終了') {
+    endReasonFields.style.display = 'block';
+  }
+  
+  // 終了タイプボタンのクリックイベント
+  document.querySelectorAll('.end-reason-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.end-reason-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('end_reason_type_hidden').value = btn.dataset.value;
+    });
   });
   
   // 保存処理
@@ -160,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ステータスが「終了」の場合、終了タイプは必須
     const statusVal = document.getElementById('status').value;
     if (statusVal === '終了') {
-      const endReasonType = document.querySelector('input[name="end_reason_type"]:checked');
+      const endReasonType = document.getElementById('end_reason_type_hidden').value;
       if (!endReasonType) {
         alert('終了タイプを選択してください');
         return;
@@ -199,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       app: appVal || null,
       summary: summaryVal || null,
       memo: memoVal || null,
-      end_reason_type: statusVal === '終了' ? (document.querySelector('input[name="end_reason_type"]:checked')?.value || null) : null,
+      end_reason_type: statusVal === '終了' ? (document.getElementById('end_reason_type_hidden').value || null) : null,
       end_reason_detail: statusVal === '終了' ? (document.getElementById('end_reason_detail').value.trim() || null) : null
     };
     let photoUrl = null;
@@ -244,14 +268,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           .insert(data);
         if (insErr) throw insErr;
       }
-      // 保存完了後、詳細画面または一覧に戻る
+      // 保存完了後、ポップアップを表示して一覧に戻る
+      alert('登録が完了しました！');
       window.location.href = 'profiles.html';
     } catch (err) {
       alert(err.message);
     }
-  });
-  // キャンセル処理
-  cancelBtn.addEventListener('click', () => {
-    window.location.href = 'profiles.html';
   });
 });

@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (initialProfileId) {
     document.getElementById('profileSelect').value = initialProfileId;
   }
+  
+  // 時間帯チップのクリックイベント
+  document.querySelectorAll('.time-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      document.getElementById('eventType').value = chip.dataset.value;
+    });
+  });
+  
   // フォーム送信処理
   document.getElementById('event-form').addEventListener('submit', async e => {
     e.preventDefault();
@@ -21,10 +31,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profileId = document.getElementById('profileSelect').value;
     const date = document.getElementById('eventDate').value;
     const note = document.getElementById('eventNote').value.trim();
+    const eventType = document.getElementById('eventType').value || null;
     if (!profileId || !date) return;
     if (currentEventId) {
       // 編集モード：既存のイベントを更新
-      const updateFields = { profile_id: profileId, event_date: date };
+      const updateFields = { profile_id: profileId, event_date: date, event_type: eventType };
       // 編集時のみ感想を保存
       updateFields.comment = note;
       const { error } = await supabaseClient
@@ -44,6 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           user_id: user.id,
           profile_id: profileId,
           event_date: date,
+          event_type: eventType,
           comment: ''
         });
       if (error) {
@@ -53,8 +65,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // フォームリセットと編集モード終了
     document.getElementById('event-form').reset();
+    document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('eventType').value = '';
     currentEventId = null;
-    document.getElementById('eventSubmitBtn').textContent = '追加';
+    document.getElementById('eventSubmitBtn').textContent = '登録';
     document.getElementById('commentField').style.display = 'none';
     const indicator = document.getElementById('editingIndicator');
     if (indicator) indicator.style.display = 'none';
@@ -96,7 +110,12 @@ async function populateProfiles() {
     return;
   }
   const select = document.getElementById('profileSelect');
+  // デフォルトオプションを保持
+  const defaultOption = select.querySelector('option[value=""]');
   select.innerHTML = '';
+  if (defaultOption) {
+    select.appendChild(defaultOption);
+  }
   profiles.forEach(p => {
     const option = document.createElement('option');
     option.value = p.id;

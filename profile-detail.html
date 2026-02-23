@@ -2,41 +2,60 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>プロフィール詳細 - マッチングアプリ管理</title>
+    <title>プロフィール詳細 - Match Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
     <!-- Supabase client library and initialization -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
     <script defer src="profile-detail.js"></script>
   </head>
   <body>
-    <header>
-      <h1>プロフィール詳細</h1>
-    </header>
-    <nav class="main-nav">
-      <a href="index.html">ホーム</a>
-      <a href="profiles.html" class="active">プロフィール一覧</a>
-      <a href="events.html">デート登録</a>
-      <a href="calendar.html">戦歴</a>
-      <a href="account.html">アカウント</a>
-    </nav>
-    <main>
-      <section id="detail-section">
-        <!-- プロフィール詳細情報がここに表示されます -->
-      </section>
-      <section id="detail-buttons" style="display:none;">
-        <button id="editBtn">編集</button>
-        <button id="deleteBtn">削除</button>
-        <button id="addEventBtn">デート登録</button>
-        <button id="backBtn">一覧に戻る</button>
-      </section>
-    </main>
-    <!-- 右下に固定表示するログアウトボタン -->
-    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
-    <footer>
-      <p>&copy;2026 マッチングアプリ管理</p>
-    </footer>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left" style="cursor: pointer;" onclick="window.location.href='profiles.html'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span class="app-title" style="font-weight: 600; color: #4a5568;">プロフィール一覧</span>
+        </div>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main class="main-content">
+        <section id="detail-section">
+        </section>
+        <section id="detail-buttons" style="display:none;">
+        </section>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home-new.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn active">
+          <img src="icons/profiles-new.svg" alt="プロフィール" class="nav-icon-img">
+          <span class="nav-label">プロフィール</span>
+        </a>
+        <a href="events.html" class="nav-btn">
+          <img src="icons/calendar-new.svg" alt="デート登録" class="nav-icon-img">
+          <span class="nav-label">デート登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle-new.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="analytics.html" class="nav-btn">
+          <img src="icons/chart-new.svg" alt="分析" class="nav-icon-img">
+          <span class="nav-label">分析</span>
+        </a>
+        <a href="account.html" class="nav-btn">
+          <img src="icons/settings-new.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
   </body>
 </html>

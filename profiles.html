@@ -2,83 +2,104 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>プロフィール一覧 - マッチングアプリ管理</title>
+    <title>相手一覧 - Match Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
-    <!-- Supabase client library and initialization -->
+    <link rel="stylesheet" href="dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
     <script defer src="profiles.js"></script>
   </head>
   <body>
-    <header>
-      <h1>プロフィール一覧</h1>
-    </header>
-    <nav class="main-nav">
-      <a href="index.html">ホーム</a>
-      <a href="profiles.html" class="active">プロフィール一覧</a>
-      <a href="events.html">デート登録</a>
-      <a href="calendar.html">戦歴</a>
-      <a href="account.html">アカウント</a>
-    </nav>
-    <main>
-      <section>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <h2 style="margin:0;">プロフィール一覧</h2>
-          <button id="addNewBtn" class="new-profile-btn">＋新規登録</button>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left" style="cursor: pointer;" onclick="location.href='index.html'">
+          <img src="icons/calendar_logo_colorful.svg" alt="logo" class="logo-icon">
+          <span class="app-title">Match L<span style="color:#D4869C;">o</span><span style="color:#7BA7D1;">g</span></span>
         </div>
-        <div class="search-group" style="margin-bottom:1rem;">
-          <input type="text" id="searchInput" placeholder="名前またはどんな人で検索">
-          <button type="button" id="searchBtn">検索</button>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main class="main-content">
+        <div class="section-header">
+          <h1 class="section-title">プロフィール一覧</h1>
+          <button id="addNewBtn" class="add-btn">＋新規登録</button>
         </div>
-        <!-- 詳細フィルタ -->
-        <details id="advanced-filter" style="margin-bottom:1rem;">
-          <summary style="cursor:pointer; font-weight:bold;">詳細フィルタ</summary>
-          <div style="padding:1rem; background:#f9f9f9; border-radius:8px; margin-top:0.5rem;">
-            <label>ステータス:
-              <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;">
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="本命"> 本命
-                </label>
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="あり"> あり
-                </label>
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="わからない"> わからない
-                </label>
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="ビミョウ"> ビミョウ
-                </label>
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="大人の関係"> 大人の関係
-                </label>
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="友達"> 友達
-                </label>
-                <label style="display:flex; align-items:center; gap:0.2rem;">
-                  <input type="checkbox" class="status-filter" value="終了"> 終了
-                </label>
-              </div>
-            </label>
-            <div style="display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
-              <button type="button" id="applyFilter">適用</button>
-              <button type="button" id="clearFilter" style="background:#ccc;">クリア</button>
+
+        <!-- 検索カード -->
+        <div class="card" id="searchCard" style="display:none;">
+          <div style="margin-bottom:1rem;">
+            <input type="text" id="searchInput" placeholder="名前またはどんな人で検索" style="width:100%; padding:0.5rem; border:1px solid rgba(120,150,190,0.18); border-radius:var(--radius-medium); background:rgba(255,255,255,0.6);">
+          </div>
+
+          <div class="filter-cards" style="margin-bottom:1rem;">
+            <div class="filter-card" data-status="本命">
+              <span>本命</span>
+            </div>
+            <div class="filter-card" data-status="あり">
+              <span>あり</span>
+            </div>
+            <div class="filter-card" data-status="わからない">
+              <span>わからない</span>
+            </div>
+            <div class="filter-card" data-status="ビミョウ">
+              <span>ビミョウ</span>
+            </div>
+            <div class="filter-card" data-status="大人の関係">
+              <span>大人の関係</span>
+            </div>
+            <div class="filter-card" data-status="友達">
+              <span>友達</span>
+            </div>
+            <div class="filter-card" data-status="終了">
+              <span>終了</span>
             </div>
           </div>
-        </details>
-        <!-- テーブルヘッダーをなくし、ボディのみで表示 -->
-        <table id="profiles-table">
-          <tbody>
-            <!-- Profiles will be rendered here -->
-          </tbody>
-        </table>
-      </section>
-    </main>
-    <!-- 右下に固定表示するログアウトボタン -->
-    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
-    <footer>
-      <p>&copy;2026 マッチングアプリ管理</p>
-    </footer>
+
+          <div style="display:flex; gap:0.5rem; justify-content:center;">
+            <button type="button" id="applyFilter" class="search-btn">検索</button>
+            <button type="button" id="clearFilter" class="clear-btn">クリア</button>
+          </div>
+        </div>
+
+        <!-- 検索トグルボタン -->
+        <button id="toggleSearch" style="position:fixed; bottom:90px; right:20px; width:56px; height:56px; border-radius:50%; background:var(--color-primary); border:none; box-shadow:0 4px 12px rgba(168,197,227,0.4); cursor:pointer; z-index:50; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:white;">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <!-- プロフィール一覧 -->
+        <div id="profiles-list"></div>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home-new.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn active">
+          <img src="icons/profiles-new.svg" alt="プロフィール" class="nav-icon-img">
+          <span class="nav-label">プロフィール</span>
+        </a>
+        <a href="events.html" class="nav-btn">
+          <img src="icons/calendar-new.svg" alt="デート登録" class="nav-icon-img">
+          <span class="nav-label">デート登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle-new.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="analytics.html" class="nav-btn">
+          <img src="icons/chart-new.svg" alt="分析" class="nav-icon-img">
+          <span class="nav-label">分析</span>
+        </a>
+        <a href="account.html" class="nav-btn">
+          <img src="icons/settings-new.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
   </body>
 </html>

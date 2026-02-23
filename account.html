@@ -2,89 +2,260 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <title>アカウント管理 - マッチングアプリ管理</title>
+    <title>アカウント管理 - Match Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
     <!-- Supabase client library and initialization -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabaseClient.js"></script>
     <script src="config.js"></script>
     <script src="lineHelper.js"></script>
     <script defer src="account.js"></script>
+    <style>
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(120, 150, 190, 0.1);
+      }
+      .info-row:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      .info-label {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 500;
+      }
+      .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-text-main);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-label {
+        display: block;
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        height: 48px;
+        padding: 0 14px;
+        border-radius: 12px;
+        border: 1.5px solid #e5e7eb;
+        background: #ffffff;
+        font-size: 15px;
+        color: var(--color-text-main);
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .form-input:focus {
+        border-color: #a8c5e3;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(168, 197, 227, 0.15);
+      }
+      .update-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 999px;
+        border: none;
+        background: rgba(168, 197, 227, 0.7);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 8px;
+      }
+      .update-btn:hover {
+        background: rgba(168, 197, 227, 0.85);
+        transform: translateY(-1px);
+      }
+      .danger-card {
+        background: rgba(245, 245, 245, 0.7);
+        border: 1px solid rgba(156, 163, 175, 0.3);
+      }
+      .danger-text {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+      .delete-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 999px;
+        border: none;
+        background: #9ca3af;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .delete-btn:hover {
+        background: #6b7280;
+        transform: translateY(-1px);
+      }
+      .line-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 999px;
+        border: none;
+        background: #06c755;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .line-btn:hover {
+        background: #05b04c;
+        transform: translateY(-1px);
+      }
+      .line-disconnect-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 999px;
+        border: none;
+        background: #9ca3af;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .line-disconnect-btn:hover {
+        background: #6b7280;
+        transform: translateY(-1px);
+      }
+      .line-status {
+        font-size: 14px;
+        margin-bottom: 12px;
+        font-weight: 500;
+      }
+    </style>
   </head>
   <body>
-    <header>
-      <h1>アカウント管理</h1>
-    </header>
-    <nav class="main-nav">
-      <a href="index.html">ホーム</a>
-      <a href="profiles.html">プロフィール一覧</a>
-      <a href="events.html">デート登録</a>
-      <a href="calendar.html">戦歴</a>
-      <a href="account.html" class="active">アカウント</a>
-    </nav>
-    <main>
-      <section>
-        <h2>アカウント情報</h2>
-        <p><strong>メールアドレス:</strong> <span id="current-email">-</span></p>
-        <p><strong>ニックネーム:</strong> <span id="current-nickname">-</span></p>
-      </section>
-      <section>
-        <h2>ニックネームの変更</h2>
-        <form id="nickname-form">
-          <label>新しいニックネーム:
-            <input type="text" id="new-nickname" required>
-          </label>
-          <button type="submit">ニックネームを更新</button>
-        </form>
-      </section>
-      <section>
-        <h2>メールアドレスの変更</h2>
-        <form id="email-form">
-          <label>新しいメールアドレス:
-            <input type="email" id="new-email" required>
-          </label>
-          <button type="submit">メールアドレスを更新</button>
-        </form>
-      </section>
-      <section>
-        <h2>パスワードの変更</h2>
-        <form id="password-form">
-          <label>新しいパスワード:
-            <input type="password" id="new-password" required>
-          </label>
-          <label>パスワード（確認）:
-            <input type="password" id="new-password-confirm" required>
-          </label>
-          <button type="submit">パスワードを更新</button>
-        </form>
-      </section>
-      <section>
-        <h2>アカウントの削除</h2>
-        <p>アカウントを削除すると、すべてのプロフィールやデート情報が失われます。この操作は取り消せません。</p>
-        <button id="delete-account-btn" style="background-color:#e57373;color:#ffffff;">アカウントを削除</button>
-      </section>
-      <section>
-        <h2>外部連携設定</h2>
+    <div class="app-container">
+      <header class="glass-header">
+        <div class="header-left" style="cursor: pointer;" onclick="location.href='index.html'">
+          <img src="icons/calendar_logo_colorful.svg" alt="logo" class="logo-icon">
+          <span class="app-title">Match L<span style="color:#D4869C;">o</span><span style="color:#7BA7D1;">g</span></span>
+        </div>
+        <button class="pill-btn" onclick="logout()">ログアウト</button>
+      </header>
+
+      <main class="main-content">
+        <h2 class="section-title" style="margin-bottom: 24px;">設定</h2>
         
-        <!-- LINE連携 -->
-        <div style="margin-bottom:2rem;">
-          <h3>LINE通知</h3>
-          <p id="line-status">状態: 確認中...</p>
-          <div id="line-not-connected" style="display:none;">
-            <button id="line-connect-btn" style="background-color:#06c755; color:white;">ＬＩＮＥと連携する</button>
+        <!-- アカウント情報 -->
+        <div class="card">
+          <h3 class="card-title">アカウント情報</h3>
+          <div class="info-row">
+            <span class="info-label">メールアドレス</span>
+            <span class="info-value" id="current-email">-</span>
           </div>
-          <div id="line-connected" style="display:none;">
-            <button id="line-disconnect-btn" style="background-color:#e57373;">LINE連携を解除</button>
+          <div class="info-row">
+            <span class="info-label">ニックネーム</span>
+            <span class="info-value" id="current-nickname">-</span>
           </div>
         </div>
-      </section>
-    </main>
-    <!-- 右下に固定表示するログアウトボタン -->
-    <a href="#" class="logout-bottom" onclick="logout()">ログアウト</a>
-    <footer>
-      <p>&copy;2026 マッチングアプリ管理</p>
-    </footer>
+        
+        <!-- ニックネーム変更 -->
+        <div class="card">
+          <h3 class="card-title">ニックネーム変更</h3>
+          <form id="nickname-form">
+            <div class="form-group">
+              <label class="form-label">新しいニックネーム</label>
+              <input type="text" id="new-nickname" class="form-input" required>
+            </div>
+            <button type="submit" class="update-btn">更新</button>
+          </form>
+        </div>
+        
+        <!-- メールアドレス変更 -->
+        <div class="card">
+          <h3 class="card-title">メールアドレス変更</h3>
+          <form id="email-form">
+            <div class="form-group">
+              <label class="form-label">新しいメールアドレス</label>
+              <input type="email" id="new-email" class="form-input" required>
+            </div>
+            <button type="submit" class="update-btn">更新</button>
+          </form>
+        </div>
+        
+        <!-- パスワード変更 -->
+        <div class="card">
+          <h3 class="card-title">パスワード変更</h3>
+          <form id="password-form">
+            <div class="form-group">
+              <label class="form-label">新しいパスワード</label>
+              <input type="password" id="new-password" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">パスワード（確認）</label>
+              <input type="password" id="new-password-confirm" class="form-input" required>
+            </div>
+            <button type="submit" class="update-btn">更新</button>
+          </form>
+        </div>
+        
+        <!-- LINE連携 -->
+        <div class="card">
+          <h3 class="card-title">LINE通知</h3>
+          <div class="line-status" id="line-status">状態: 確認中...</div>
+          <div id="line-not-connected" style="display:none;">
+            <button id="line-connect-btn" class="line-btn">LINEと連携する</button>
+          </div>
+          <div id="line-connected" style="display:none;">
+            <button id="line-disconnect-btn" class="line-disconnect-btn">LINE連携を解除</button>
+          </div>
+        </div>
+        
+        <!-- アカウント削除 -->
+        <div class="card danger-card">
+          <h3 class="card-title">アカウント削除</h3>
+          <p class="danger-text">アカウントを削除すると、すべてのプロフィールやデート情報が失われます。この操作は取り消せません。</p>
+          <button id="delete-account-btn" class="delete-btn">アカウントを削除</button>
+        </div>
+      </main>
+
+      <nav class="bottom-nav">
+        <a href="index.html" class="nav-btn">
+          <img src="icons/home-new.svg" alt="ホーム" class="nav-icon-img">
+          <span class="nav-label">ホーム</span>
+        </a>
+        <a href="profiles.html" class="nav-btn">
+          <img src="icons/profiles-new.svg" alt="プロフィール" class="nav-icon-img">
+          <span class="nav-label">プロフィール</span>
+        </a>
+        <a href="events.html" class="nav-btn">
+          <img src="icons/calendar-new.svg" alt="デート登録" class="nav-icon-img">
+          <span class="nav-label">デート登録</span>
+        </a>
+        <a href="calendar.html" class="nav-btn">
+          <img src="icons/battle-new.svg" alt="戦歴" class="nav-icon-img">
+          <span class="nav-label">戦歴</span>
+        </a>
+        <a href="analytics.html" class="nav-btn">
+          <img src="icons/chart-new.svg" alt="分析" class="nav-icon-img">
+          <span class="nav-label">分析</span>
+        </a>
+        <a href="account.html" class="nav-btn active">
+          <img src="icons/settings-new.svg" alt="設定" class="nav-icon-img">
+          <span class="nav-label">設定</span>
+        </a>
+      </nav>
+    </div>
   </body>
 </html>
