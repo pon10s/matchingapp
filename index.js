@@ -91,6 +91,7 @@ async function checkLineConnection(user) {
       // 既存ユーザーは「連携します。このまま送信してください。」と事前入力
       const message = encodeURIComponent('連携します。このまま送信してください。');
       const lineUrl = `https://line.me/R/oaMessage/@840izdny/?${message}`;
+      console.log('LINE URL (index.js):', lineUrl);
       window.open(lineUrl, '_blank');
     };
   }
