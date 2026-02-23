@@ -88,8 +88,8 @@ async function checkLineConnection(user) {
         return;
       }
       
-      // LINE友達追加画面を開く
-      const lineUrl = `https://line.me/R/ti/p/@840izdny`;
+      // 既存ユーザーは「連携します。このまま送信してください。」と事前入力
+      const lineUrl = `https://line.me/R/ti/p/@840izdny?text=${encodeURIComponent('連携します。このまま送信してください。')}`;
       window.open(lineUrl, '_blank');
     };
   }

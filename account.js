@@ -221,8 +221,8 @@ async function loadExternalSettings(user) {
         return;
       }
       
-      // 新規登録は友達追加だけ、既存ユーザーは「連携」と送信
-      const lineUrl = `https://line.me/R/ti/p/@840izdny`;
+      // 既存ユーザーは「連携します。このまま送信してください。」と事前入力
+      const lineUrl = `https://line.me/R/ti/p/@840izdny?text=${encodeURIComponent('連携します。このまま送信してください。')}`;
       window.open(lineUrl, '_blank');
     });
   }
