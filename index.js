@@ -69,8 +69,28 @@ async function checkLineConnection(user) {
   // LINE連携していない場合はバナーを表示
   if (!settings || !settings.line_user_id) {
     banner.style.display = 'block';
-    banner.onclick = () => {
-      window.open('https://line.me/R/ti/p/@840izdny', '_blank');
+    banner.onclick = async () => {
+      // 連携コードを生成
+      const code = Math.random().toString(36).substring(2, 15);
+      
+      // line_connection_codesテーブルに保存
+      const { error } = await supabaseClient
+        .from('line_connection_codes')
+        .insert({
+          user_id: user.id,
+          code: code,
+          expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10分後
+        });
+      
+      if (error) {
+        console.error('Error creating connection code:', error);
+        alert('連携コードの生成に失敗しました');
+        return;
+      }
+      
+      // LINE友達追加画面を開く
+      const lineUrl = `https://line.me/R/ti/p/@840izdny`;
+      window.open(lineUrl, '_blank');
     };
   }
 }
