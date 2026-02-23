@@ -221,10 +221,9 @@ async function loadExternalSettings(user) {
         return;
       }
       
-      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?${code}`;
+      // ユーザーにはコードを見せず、事前入力されたメッセージとして送信
+      const lineUrl = `https://line.me/R/oaMessage/@840izdny/?${encodeURIComponent(code)}`;
       window.open(lineUrl, '_blank');
-      
-      alert('連携コードを生成しました。LINEでメッセージを送信してください。');
     });
   }
   
