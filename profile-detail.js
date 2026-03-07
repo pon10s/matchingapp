@@ -9,30 +9,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   const user = await ensureLoggedIn();
   if (!user) return;
   const profileId = getQueryParam('id');
-  if (!profileId) {
-    window.location.href = 'profiles.html';
-    return;
-  }
-  const { data: profile, error } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('id', profileId)
-    .eq('user_id', user.id)
-    .single();
+  if (!profileId) { window.location.href = 'profiles.html'; return; }
+
+  // profileとeventsを並列取得
+  const [
+    { data: profile, error },
+    { data: events }
+  ] = await Promise.all([
+    supabaseClient.from('profiles').select('*').eq('id', profileId).eq('user_id', user.id).single(),
+    supabaseClient.from('events').select('id').eq('user_id', user.id).eq('profile_id', profileId).lte('event_date', new Date().toISOString().split('T')[0])
+  ]);
+
   if (error) {
-    console.error(error);
     alert('プロフィールが見つかりません');
     window.location.href = 'profiles.html';
     return;
   }
-  
-  // 会った回数を取得
-  const { data: events } = await supabaseClient
-    .from('events')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('profile_id', profileId)
-    .lte('event_date', new Date().toISOString().split('T')[0]);
   
   profile.eventCount = events ? events.length : 0;
   

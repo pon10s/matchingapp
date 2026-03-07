@@ -48,82 +48,42 @@ async function loadData() {
   const user = await ensureLoggedIn();
   if (!user) return;
 
+  // profilesとeventsを一度に並列取得
+  const [
+    { data: allProfiles },
+    { data: allEvents }
+  ] = await Promise.all([
+    supabaseClient.from('profiles').select('*').eq('user_id', user.id),
+    supabaseClient.from('events').select('event_date, profile_id').eq('user_id', user.id)
+  ]);
+
   // 期間フィルタ
-  let dateFilter = null;
+  let periodStart = null;
   if (currentPeriod !== 'all') {
-    const months = parseInt(currentPeriod);
-    const date = new Date();
-    date.setMonth(date.getMonth() - months);
-    dateFilter = date.toISOString();
+    periodStart = new Date();
+    periodStart.setMonth(periodStart.getMonth() - parseInt(currentPeriod));
   }
 
-  // プロフィール取得
-  let query = supabaseClient.from('profiles').select('*').eq('user_id', user.id);
-  if (dateFilter) {
-    query = query.gte('created_at', dateFilter);
-  }
-  const { data: profiles, error } = await query;
-  if (error) {
-    console.error(error);
-    return;
-  }
+  const profiles = periodStart
+    ? allProfiles.filter(p => new Date(p.created_at) >= periodStart)
+    : allProfiles;
+
+  const periodEvents = periodStart
+    ? allEvents.filter(e => new Date(e.event_date) >= periodStart)
+    : allEvents;
 
   // KPI計算
-  // 進行中人数（期間無関係）
-  const { data: allProfiles } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id);
-  const active = allProfiles ? allProfiles.filter(p => p.status !== '終了').length : 0;
-  
-  // 選択期間の新規登録数
-  let periodProfiles = 0;
-  
-  if (currentPeriod === 'all') {
-    periodProfiles = allProfiles ? allProfiles.length : 0;
-  } else {
-    const months = parseInt(currentPeriod);
-    const periodStart = new Date();
-    periodStart.setMonth(periodStart.getMonth() - months);
-    periodProfiles = allProfiles ? allProfiles.filter(p => new Date(p.created_at) >= periodStart).length : 0;
-  }
-
-  // 選択期間のデート件数
-  const { data: allEvents } = await supabaseClient
-    .from('events')
-    .select('event_date')
-    .eq('user_id', user.id);
-  
-  let periodEvents = 0;
-  
-  if (currentPeriod === 'all') {
-    periodEvents = allEvents ? allEvents.length : 0;
-  } else {
-    const months = parseInt(currentPeriod);
-    const periodStart = new Date();
-    periodStart.setMonth(periodStart.getMonth() - months);
-    periodEvents = allEvents ? allEvents.filter(e => new Date(e.event_date) >= periodStart).length : 0;
-  }
-
-  // 2回目到達率（期間無関係）
-  const { data: eventsByProfile } = await supabaseClient
-    .from('events')
-    .select('profile_id')
-    .eq('user_id', user.id);
-  
+  const active = allProfiles.filter(p => p.status !== '終了').length;
   const profileEventCount = {};
-  if (eventsByProfile) {
-    eventsByProfile.forEach(e => {
-      profileEventCount[e.profile_id] = (profileEventCount[e.profile_id] || 0) + 1;
-    });
-  }
-  
+  allEvents.forEach(e => {
+    profileEventCount[e.profile_id] = (profileEventCount[e.profile_id] || 0) + 1;
+  });
   const profilesWithEvents = Object.keys(profileEventCount).length;
-  const profilesWith2Plus = Object.values(profileEventCount).filter(count => count >= 2).length;
+  const profilesWith2Plus = Object.values(profileEventCount).filter(c => c >= 2).length;
   const secondDateRate = profilesWithEvents > 0 ? Math.round((profilesWith2Plus / profilesWithEvents) * 100) : 0;
 
-  document.getElementById('new-profiles').textContent = periodProfiles > 0 ? '+' + periodProfiles : periodProfiles;
-  document.getElementById('event-change').textContent = periodEvents > 0 ? '+' + periodEvents : periodEvents;
+  document.getElementById('new-profiles').textContent = profiles.length > 0 ? '+' + profiles.length : profiles.length;
+  document.getElementById('event-change').textContent = periodEvents.length > 0 ? '+' + periodEvents.length : periodEvents.length;
   document.getElementById('active-profiles').textContent = active;
   document.getElementById('second-date-rate').textContent = secondDateRate + '%';
 
@@ -133,7 +93,7 @@ async function loadData() {
   } else if (currentTab === 'profiles') {
     drawProfilesChart(profiles);
   } else if (currentTab === 'events') {
-    await drawEventsChart(user.id);
+    drawEventsChart(periodEvents);
   } else if (currentTab === 'app') {
     drawAppChart(profiles);
   }
@@ -177,21 +137,7 @@ function drawProfilesChart(profiles) {
   drawChart('bar', labels, data, '#D4B5D3');
 }
 
-async function drawEventsChart(userId) {
-  // イベント取得
-  let query = supabaseClient.from('events').select('event_date').eq('user_id', userId);
-  if (currentPeriod !== 'all') {
-    const months = parseInt(currentPeriod);
-    const date = new Date();
-    date.setMonth(date.getMonth() - months);
-    query = query.gte('event_date', date.toISOString().split('T')[0]);
-  }
-  const { data: events, error } = await query;
-  if (error) {
-    console.error(error);
-    return;
-  }
-
+function drawEventsChart(events) {
   const monthCount = {};
   events.forEach(e => {
     const date = new Date(e.event_date);
@@ -200,10 +146,7 @@ async function drawEventsChart(userId) {
   });
 
   const sorted = Object.keys(monthCount).sort();
-  const labels = sorted;
-  const data = sorted.map(k => monthCount[k]);
-
-  drawChart('bar', labels, data, '#A8C5E3');
+  drawChart('bar', sorted, sorted.map(k => monthCount[k]), '#A8C5E3');
 }
 
 function drawAppChart(profiles) {
