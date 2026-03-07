@@ -62,21 +62,14 @@ async function refreshProfiles(keyword = '') {
   const user = await ensureLoggedIn();
   if (!user) return;
   
-  const { data: profiles, error: profErr } = await supabaseClient
-    .from('profiles')
-    .select('id, name, status, summary, photo_url, age, height, occupation')
-    .eq('user_id', user.id);
-  if (profErr) {
-    console.error(profErr);
-    return;
-  }
+  const today = new Date().toISOString().split('T')[0];
   
-  // イベント数を取得
-  const { data: events } = await supabaseClient
-    .from('events')
-    .select('profile_id')
-    .eq('user_id', user.id)
-    .lte('event_date', new Date().toISOString().split('T')[0]);
+  // profilesとeventsを並列取得
+  const [{ data: profiles, error: profErr }, { data: events }] = await Promise.all([
+    supabaseClient.from('profiles').select('id, name, status, summary, photo_url, age, height, occupation').eq('user_id', user.id),
+    supabaseClient.from('events').select('profile_id').eq('user_id', user.id).lte('event_date', today)
+  ]);
+  if (profErr) { console.error(profErr); return; }
   
   const eventCounts = {};
   if (events) {

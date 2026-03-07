@@ -64,24 +64,17 @@ function formatEventType(eventType) {
 async function refreshCalendar() {
   const user = await ensureLoggedIn();
   if (!user) return;
-  // イベントを取得
-  const { data: events, error: evError } = await supabaseClient
-    .from('events')
-    .select('id, profile_id, event_date, comment, event_type')
-    .eq('user_id', user.id);
-  if (evError) {
-    console.error(evError);
-    return;
-  }
-  // プロフィールを取得（写真含む）
-  const { data: profiles, error: prError } = await supabaseClient
-    .from('profiles')
-    .select('id, name, photo_url')
-    .eq('user_id', user.id);
-  if (prError) {
-    console.error(prError);
-    return;
-  }
+  
+  // eventsとprofilesを並列取得
+  const [
+    { data: events, error: evError },
+    { data: profiles, error: prError }
+  ] = await Promise.all([
+    supabaseClient.from('events').select('id, profile_id, event_date, comment, event_type').eq('user_id', user.id),
+    supabaseClient.from('profiles').select('id, name, photo_url').eq('user_id', user.id)
+  ]);
+  if (evError) { console.error(evError); return; }
+  if (prError) { console.error(prError); return; }
   // プロファイルごとに日付順でソートし、回数を付与
   const eventsByProfile = {};
   events.forEach(ev => {

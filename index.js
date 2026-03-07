@@ -26,14 +26,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   
   console.log('User logged in:', user.id);
   
-  // LINE連携状況を確認
-  await checkLineConnection(user);
-  
-  // AIアドバイスを読み込み
-  await loadAIAdvice(user);
-  
-  // 統計情報と未更新イベントを読み込み
-  await loadStatsAndPending();
+  // LINE連携・スタッツ・アドバイスを並列実行
+  await Promise.all([
+    checkLineConnection(user),
+    loadStatsAndPending(),
+  ]);
+  loadAIAdvice(user); // AIは非同期で待たない
   
   console.log('Stats loaded');
   
@@ -236,25 +234,16 @@ async function loadStatsAndPending() {
   nextWeek.setDate(nextWeek.getDate() + 7);
   const nextWeekStr = nextWeek.toISOString().slice(0, 10);
   console.log('Today:', today);
-  // プロフィールとイベントを取得
-  const { data: profiles, error: profError } = await supabaseClient
-    .from('profiles')
-    .select('id, name, status, summary, app, photo_url')
-    .eq('user_id', user.id);
-  if (profError) {
-    console.error('Profile error:', profError);
-    return;
-  }
-  console.log('Profiles:', profiles);
-  const { data: events, error: evError } = await supabaseClient
-    .from('events')
-    .select('id, profile_id, event_date, comment, event_type')
-    .eq('user_id', user.id);
-  if (evError) {
-    console.error('Events error:', evError);
-    return;
-  }
-  console.log('Events:', events);
+  // プロフィールとイベントを並列取得
+  const [
+    { data: profiles, error: profError },
+    { data: events, error: evError }
+  ] = await Promise.all([
+    supabaseClient.from('profiles').select('id, name, status, summary, app, photo_url').eq('user_id', user.id),
+    supabaseClient.from('events').select('id, profile_id, event_date, comment, event_type').eq('user_id', user.id)
+  ]);
+  if (profError) { console.error('Profile error:', profError); return; }
+  if (evError) { console.error('Events error:', evError); return; }
   
   allProfiles = profiles || [];
   allEvents = events || [];
